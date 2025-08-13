@@ -174,17 +174,7 @@ const DailyTasks = ({ currentDate }) => {
     return selectedDateObj < today;
   };
 
-  // Check if the next date would be in the future
-  const isNextDateInFuture = () => {
-    const nextDate = addDays(new Date(selectedDate), 1);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const nextDateString = nextDate.toISOString().split('T')[0];
-    const todayString = today.toISOString().split('T')[0];
-    const isFuture = nextDateString > todayString;
-    
-    return isFuture;
-  };
+
 
   const handleShowAddForm = (userId) => {
     setShowAddForm({ ...showAddForm, [userId]: true });
@@ -199,7 +189,7 @@ const DailyTasks = ({ currentDate }) => {
   const handleAddTask = async (userId) => {
     if (!newTask.title.trim()) return;
     
-    // Prevent adding tasks to past dates
+    // Prevent adding tasks to past dates only
     if (isDateInPast()) {
       alert('Cannot add tasks to past dates. Tasks can only be added to today or future dates.');
       return;
@@ -446,19 +436,8 @@ const DailyTasks = ({ currentDate }) => {
           <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>
             {getDateDisplayText(selectedDate)}
           </span>
-          {isDateInPast() && (
-            <span style={{
-              fontSize: '0.75rem',
-              color: 'var(--accent-orange)',
-              background: 'rgba(255, 165, 0, 0.1)',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '4px',
-              border: '1px solid rgba(255, 165, 0, 0.3)'
-            }}>
-              Read-only
-            </span>
-          )}
-          {(isDateInPast() || selectedDate !== currentDate) && (
+
+          {selectedDate !== currentDate && (
             <button
               onClick={() => setSelectedDate(currentDate)}
               style={{
@@ -477,14 +456,12 @@ const DailyTasks = ({ currentDate }) => {
         </div>
         <button
           onClick={() => handleDateChange('next')}
-          disabled={isNextDateInFuture()}
           style={{
             background: 'none',
             border: 'none',
-            color: isNextDateInFuture() ? 'var(--text-muted)' : 'var(--text-secondary)',
-            cursor: isNextDateInFuture() ? 'not-allowed' : 'pointer',
-            padding: '0.5rem',
-            opacity: isNextDateInFuture() ? 0.5 : 1
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            padding: '0.5rem'
           }}
         >
           <ChevronRight size={16} />
