@@ -299,7 +299,13 @@ const Dashboard = ({ currentDate, onForceRefreshDate }) => {
             <br />
             Current Date from App: <span style={{ color: 'var(--accent-blue)' }}>{currentDate}</span>
             <br />
-            System Date: <span style={{ color: 'var(--accent-green)' }}>{new Date().toISOString().split('T')[0]}</span>
+                         System Date: <span style={{ color: 'var(--accent-green)' }}>{(() => {
+               const now = new Date();
+               const year = now.getFullYear();
+               const month = String(now.getMonth() + 1).padStart(2, '0');
+               const day = String(now.getDate()).padStart(2, '0');
+               return `${year}-${month}-${day}`;
+             })()}</span>
             <br />
             Current Time: <span style={{ color: 'var(--text-secondary)' }}>{currentTime.toLocaleTimeString()}</span>
           </div>

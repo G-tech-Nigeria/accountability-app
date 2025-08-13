@@ -16,23 +16,44 @@ import { applyTheme, loadThemePreferences, applyFont, loadFontPreference } from 
 import './App.css';
 
 function App() {
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [currentDate, setCurrentDate] = useState(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  });
   const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
 
+  // Helper function to get current date in local timezone
+  const getCurrentDateString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Helper function to get date string from a Date object in local timezone
+  const getDateString = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Force update current date on app start
   useEffect(() => {
-    const now = new Date();
-    const today = now.toISOString().split('T')[0];
+    const today = getCurrentDateString();
     console.log('App: Initial date set to:', today);
     setCurrentDate(today);
   }, []);
 
   // Function to force refresh current date
   const forceRefreshDate = () => {
-    const now = new Date();
-    const today = now.toISOString().split('T')[0];
+    const today = getCurrentDateString();
     console.log('App: Force refreshing date to:', today);
     setCurrentDate(today);
   };
@@ -49,8 +70,7 @@ function App() {
   useEffect(() => {
     try {
       const updateDate = async () => {
-        const now = new Date();
-        const newDate = now.toISOString().split('T')[0];
+        const newDate = getCurrentDateString();
         
         console.log('App: Current system date:', newDate);
         console.log('App: Previous currentDate state:', currentDate);
@@ -69,7 +89,7 @@ function App() {
             // Check last 7 days for missed tasks and calculate penalties
             for (let i = 1; i <= 7; i++) {
               const checkDate = subDays(today, i);
-              const dateStr = checkDate.toISOString().split('T')[0];
+              const dateStr = getDateString(checkDate);
               await calculateMissedTaskPenalties(dateStr);
             }
           } catch (error) {
