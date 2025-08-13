@@ -21,6 +21,14 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
 
+  // Force update current date on app start
+  useEffect(() => {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    console.log('App: Initial date set to:', today);
+    setCurrentDate(today);
+  }, []);
+
     // Load theme preferences on app start
   useEffect(() => {
     const { themeName, customColors } = loadThemePreferences();
@@ -33,28 +41,34 @@ function App() {
   useEffect(() => {
     try {
       const updateDate = async () => {
-              const now = new Date();
-              const newDate = now.toISOString().split('T')[0];
-              
-              // Use the actual system date (August 2025)
-              setCurrentDate(newDate);
-              
-              // Check for penalties when date changes
-              try {
-                // Use the actual system date (August 2025)
-                const today = new Date(newDate);
-                today.setHours(0, 0, 0, 0);
-                
-                // Check last 7 days for missed tasks and calculate penalties
-                for (let i = 1; i <= 7; i++) {
-                  const checkDate = subDays(today, i);
-                  const dateStr = checkDate.toISOString().split('T')[0];
-                  await calculateMissedTaskPenalties(dateStr);
-                }
-              } catch (error) {
-                console.error('Error calculating penalties in App:', error);
-              }
-            };
+        const now = new Date();
+        const newDate = now.toISOString().split('T')[0];
+        
+        console.log('App: Current system date:', newDate);
+        console.log('App: Previous currentDate state:', currentDate);
+        
+        // Only update if the date has actually changed
+        if (newDate !== currentDate) {
+          console.log('App: Date changed from', currentDate, 'to', newDate);
+          setCurrentDate(newDate);
+          
+          // Check for penalties when date changes
+          try {
+            // Use the actual system date (August 2025)
+            const today = new Date(newDate);
+            today.setHours(0, 0, 0, 0);
+            
+            // Check last 7 days for missed tasks and calculate penalties
+            for (let i = 1; i <= 7; i++) {
+              const checkDate = subDays(today, i);
+              const dateStr = checkDate.toISOString().split('T')[0];
+              await calculateMissedTaskPenalties(dateStr);
+            }
+          } catch (error) {
+            console.error('Error calculating penalties in App:', error);
+          }
+        }
+      };
 
       // Update immediately
       updateDate();
@@ -67,7 +81,7 @@ function App() {
       console.error('Error in App useEffect:', err);
       setError(err.message);
     }
-  }, []); // Empty dependency array to run only once
+  }, [currentDate]); // Add currentDate as dependency to trigger updates
 
   // Close sidebar when route changes (mobile)
   const handleRouteChange = () => {
