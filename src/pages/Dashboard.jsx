@@ -26,7 +26,7 @@ import { checkAllAchievements } from '../utils/achievements';
 import { format, subDays } from 'date-fns';
 import ProgressCircle from '../components/ProgressCircle';
 
-const Dashboard = ({ currentDate }) => {
+const Dashboard = ({ currentDate, onForceRefreshDate }) => {
   const [users, setUsers] = useState([]);
   const [penaltySummary, setPenaltySummary] = useState({});
   const [achievements, setAchievements] = useState({});
@@ -284,7 +284,41 @@ const Dashboard = ({ currentDate }) => {
         <span>Overview</span>
       </div>
 
-      
+      {/* Debug Section - Remove after fixing date issue */}
+      <div style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--accent-orange)',
+        borderRadius: '8px',
+        padding: '1rem',
+        marginBottom: '1rem',
+        fontSize: '0.875rem'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <strong>🔧 Date Debug:</strong>
+            <br />
+            Current Date from App: <span style={{ color: 'var(--accent-blue)' }}>{currentDate}</span>
+            <br />
+            System Date: <span style={{ color: 'var(--accent-green)' }}>{new Date().toISOString().split('T')[0]}</span>
+            <br />
+            Current Time: <span style={{ color: 'var(--text-secondary)' }}>{currentTime.toLocaleTimeString()}</span>
+          </div>
+          <button
+            onClick={onForceRefreshDate}
+            style={{
+              background: 'var(--accent-orange)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '0.5rem 1rem',
+              cursor: 'pointer',
+              fontSize: '0.75rem'
+            }}
+          >
+            🔄 Force Refresh Date
+          </button>
+        </div>
+      </div>
 
       {/* Welcome Section */}
       <div className="ai-assistant-card">

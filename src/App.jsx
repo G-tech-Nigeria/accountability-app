@@ -29,6 +29,14 @@ function App() {
     setCurrentDate(today);
   }, []);
 
+  // Function to force refresh current date
+  const forceRefreshDate = () => {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    console.log('App: Force refreshing date to:', today);
+    setCurrentDate(today);
+  };
+
     // Load theme preferences on app start
   useEffect(() => {
     const { themeName, customColors } = loadThemePreferences();
@@ -81,7 +89,7 @@ function App() {
       console.error('Error in App useEffect:', err);
       setError(err.message);
     }
-  }, [currentDate]); // Add currentDate as dependency to trigger updates
+  }, []); // Remove currentDate dependency to prevent infinite loop
 
   // Close sidebar when route changes (mobile)
   const handleRouteChange = () => {
@@ -163,13 +171,13 @@ function App() {
           onThemeClick={() => setShowThemeSelector(true)}
         />
         <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard currentDate={currentDate} />} />
-            <Route path="/tasks" element={<DailyTasks currentDate={currentDate} />} />
-            <Route path="/achievements" element={<Achievements />} />
-            <Route path="/settings" element={<SettingsPage />} />
-          </Routes>
+                          <Routes>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<Dashboard currentDate={currentDate} onForceRefreshDate={forceRefreshDate} />} />
+                  <Route path="/tasks" element={<DailyTasks currentDate={currentDate} />} />
+                  <Route path="/achievements" element={<Achievements />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                </Routes>
         </div>
         <NotificationManager />
         <PWAInstallPrompt />
