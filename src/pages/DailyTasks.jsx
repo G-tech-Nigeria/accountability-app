@@ -569,15 +569,15 @@ const DailyTasks = ({ currentDate }) => {
                         <span style={{ fontSize: '1rem' }}>
                           {task.icon || '📝'}
                         </span>
-                        <div style={{
-                          fontSize: '0.875rem',
-                          fontWeight: '500',
-                          textDecoration: task.status === 'completed' ? 'line-through' : 'none',
+                      <div style={{
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        textDecoration: task.status === 'completed' ? 'line-through' : 'none',
                           color: task.status === 'completed' ? 'var(--text-muted)' : 'var(--text-primary)',
                           wordWrap: 'break-word',
                           flex: 1
-                        }}>
-                          {task.title}
+                      }}>
+                        {task.title}
                         </div>
                       </div>
                       
@@ -673,10 +673,10 @@ const DailyTasks = ({ currentDate }) => {
                               alt="Task proof"
                               onClick={() => setSelectedImage(getImageUrl(task.proof))}
                               style={{
-                                width: '100%',
-                                maxWidth: '200px',
-                                height: '120px',
-                                objectFit: 'cover',
+                              width: '100%',
+                              maxWidth: '200px',
+                              height: '120px',
+                              objectFit: 'cover',
                               borderRadius: '6px',
                               border: '1px solid var(--sidebar-border)',
                               cursor: 'pointer',
@@ -751,23 +751,23 @@ const DailyTasks = ({ currentDate }) => {
                     >
                       {selectedTaskIcon}
                     </button>
-                    <input
+                  <input
                       ref={(el) => taskTitleRefs.current[user.id] = el}
-                      type="text"
-                      placeholder="Task title"
-                      value={newTask.title}
-                      onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                      style={{
+                    type="text"
+                    placeholder="Task title"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                    style={{
                         flex: 1,
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--sidebar-border)',
-                        borderRadius: '6px',
-                        padding: '0.5rem',
-                        color: 'var(--text-primary)',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--sidebar-border)',
+                      borderRadius: '6px',
+                      padding: '0.5rem',
+                      color: 'var(--text-primary)',
                         fontSize: '0.875rem'
-                      }}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddTask(user.id)}
-                    />
+                    }}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddTask(user.id)}
+                  />
                   </div>
                   <input
                     type="text"
