@@ -29,6 +29,11 @@ const DailyTasks = ({ currentDate }) => {
   const [selectedTaskIcon, setSelectedTaskIcon] = useState('📝');
   const taskTitleRefs = useRef({});
 
+  // Update selectedDate when currentDate changes (e.g., when date changes automatically)
+  useEffect(() => {
+    setSelectedDate(currentDate);
+  }, [currentDate]);
+
   useEffect(() => {
     const loadDataAsync = async () => {
       await loadData();
@@ -453,9 +458,9 @@ const DailyTasks = ({ currentDate }) => {
               Read-only
             </span>
           )}
-          {isDateInPast() && (
+          {(isDateInPast() || selectedDate !== currentDate) && (
             <button
-              onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+              onClick={() => setSelectedDate(currentDate)}
               style={{
                 background: 'var(--accent-blue)',
                 color: 'white',
