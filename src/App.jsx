@@ -193,7 +193,7 @@ function App() {
         <div className="main-content">
                           <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/dashboard" element={<Dashboard currentDate={currentDate} onForceRefreshDate={forceRefreshDate} />} />
+                  <Route path="/dashboard" element={<Dashboard currentDate={currentDate} />} />
                   <Route path="/tasks" element={<DailyTasks currentDate={currentDate} />} />
                   <Route path="/achievements" element={<Achievements />} />
                   <Route path="/settings" element={<SettingsPage />} />
