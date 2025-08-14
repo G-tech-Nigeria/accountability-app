@@ -20,36 +20,28 @@ import {
   CloudSnow,
   Wind
 } from 'lucide-react';
-import { getUsers, getTasks, getPenaltySummary, calculateMissedTaskPenalties } from '../utils/database';
+import { calculateMissedTaskPenalties } from '../utils/database';
 import { getUserAchievements } from '../utils/achievements';
 import { checkAllAchievements } from '../utils/achievements';
 import { format, subDays } from 'date-fns';
 import ProgressCircle from '../components/ProgressCircle';
+import { useRealtimeData } from '../hooks/useRealtimeData';
 
 const Dashboard = ({ currentDate }) => {
-  const [users, setUsers] = useState([]);
-  const [penaltySummary, setPenaltySummary] = useState({});
+  const { users, tasks, penalties: penaltySummary, loading, error, refreshData } = useRealtimeData();
   const [achievements, setAchievements] = useState({});
   const [stats, setStats] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weather, setWeather] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
 
+  // Calculate stats when users or tasks change
   useEffect(() => {
-    const loadData = async () => {
-    try {
-
-        await loadDashboardData();
-    } catch (err) {
-      console.error('Error in Dashboard useEffect:', err);
-      setError(err.message);
+    if (users.length > 0 && tasks.length > 0) {
+      calculateStats();
+      loadAchievements();
     }
-    };
-    
-    loadData();
-  }, [currentDate]);
+  }, [users, tasks, currentDate]);
 
   // Check for penalties when component mounts
   useEffect(() => {
@@ -164,86 +156,65 @@ const Dashboard = ({ currentDate }) => {
     }
   };
 
-  const loadDashboardData = async () => {
-    try {
-      const usersData = await getUsers();
-      const tasksData = await getTasks();
+  const calculateStats = () => {
+    // Calculate stats for each user
+    const userStats = {};
+    users.forEach(user => {
+      const userTasks = tasks.filter(task => task.userId === user.id);
+      const completedTasks = userTasks.filter(task => task.status === 'completed');
+      const todayTasks = userTasks.filter(task => task.date === currentDate);
+      const todayCompleted = todayTasks.filter(task => task.status === 'completed');
       
-      // Calculate penalties for missed tasks from previous days
+      // Calculate streak
+      let streak = 0;
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      // Check last 7 days for missed tasks and calculate penalties
-      for (let i = 1; i <= 7; i++) {
-        const checkDate = subDays(today, i);
+      for (let i = 0; i < 30; i++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() - i);
         const dateStr = checkDate.toISOString().split('T')[0];
-        await calculateMissedTaskPenalties(dateStr);
+        
+        const dayTasks = userTasks.filter(task => task.date === dateStr);
+        if (dayTasks.length === 0) break;
+        
+        const allCompleted = dayTasks.every(task => task.status === 'completed');
+        if (!allCompleted) break;
+        
+        streak++;
       }
       
-      const penaltyData = await getPenaltySummary();
-      
-      // Calculate stats for each user
-      const userStats = {};
-      usersData.forEach(user => {
-        const userTasks = tasksData.filter(task => task.userId === user.id);
-        const completedTasks = userTasks.filter(task => task.status === 'completed');
-        const todayTasks = userTasks.filter(task => task.date === currentDate);
-        const todayCompleted = todayTasks.filter(task => task.status === 'completed');
-        
-        // Calculate streak
-        let streak = 0;
-        const today = new Date();
-        for (let i = 0; i < 30; i++) {
-          const checkDate = new Date(today);
-          checkDate.setDate(today.getDate() - i);
-          const dateStr = checkDate.toISOString().split('T')[0];
-          
-          const dayTasks = userTasks.filter(task => task.date === dateStr);
-          if (dayTasks.length === 0) break;
-          
-          const allCompleted = dayTasks.every(task => task.status === 'completed');
-          if (!allCompleted) break;
-          
-          streak++;
-        }
-        
-        userStats[user.id] = {
-          totalTasks: userTasks.length,
-          completedTasks: completedTasks.length,
-          completionRate: userTasks.length > 0 ? (completedTasks.length / userTasks.length) * 100 : 0,
-          todayTasks: todayTasks.length,
-          todayCompleted: todayCompleted.length,
-          todayRate: todayTasks.length > 0 ? (todayCompleted.length / todayTasks.length) * 100 : 0,
-          streak: streak
-        };
-      });
+      userStats[user.id] = {
+        totalTasks: userTasks.length,
+        completedTasks: completedTasks.length,
+        completionRate: userTasks.length > 0 ? (completedTasks.length / userTasks.length) * 100 : 0,
+        todayTasks: todayTasks.length,
+        todayCompleted: todayCompleted.length,
+        todayRate: todayTasks.length > 0 ? (todayCompleted.length / todayTasks.length) * 100 : 0,
+        streak: streak
+      };
+    });
 
+    setStats(userStats);
+  };
+
+  const loadAchievements = async () => {
+    try {
       // Get achievements for each user
       const userAchievements = {};
-        for (const user of usersData) {
-          userAchievements[user.id] = await getUserAchievements(user.id);
-        }
-
-
-
-      setUsers(usersData);
-      setPenaltySummary(penaltyData);
+      for (const user of users) {
+        userAchievements[user.id] = await getUserAchievements(user.id);
+      }
       setAchievements(userAchievements);
-      setStats(userStats);
-      setLoading(false);
 
       // Check for new achievements
-        for (const user of usersData) {
+      for (const user of users) {
         try {
-            await checkAllAchievements(user.id, currentDate);
+          await checkAllAchievements(user.id, currentDate);
         } catch (err) {
           console.error('Error checking achievements for user:', user.id, err);
-          }
         }
+      }
     } catch (err) {
-      console.error('Error in loadDashboardData:', err);
-      setError(err.message);
-      setLoading(false);
+      console.error('Error loading achievements:', err);
     }
   };
 
@@ -282,6 +253,23 @@ const Dashboard = ({ currentDate }) => {
         <span>Dashboard</span>
         <span className="breadcrumb-separator">{'>'}</span>
         <span>Overview</span>
+        <button
+          onClick={refreshData}
+          disabled={loading}
+          style={{
+            marginLeft: 'auto',
+            background: 'var(--accent-blue)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            padding: '0.25rem 0.5rem',
+            fontSize: '0.75rem',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.6 : 1
+          }}
+        >
+          {loading ? '🔄 Loading...' : '🔄 Refresh'}
+        </button>
       </div>
 
 
