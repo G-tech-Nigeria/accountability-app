@@ -10,9 +10,10 @@ import NotificationManager from './components/NotificationManager';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
 import ThemeSelector from './components/ThemeSelector';
-import { calculateMissedTaskPenalties } from './utils/database';
+import { calculateMissedTaskPenalties, getSettings } from './utils/database';
 import { subDays } from 'date-fns';
 import { applyTheme, loadThemePreferences, applyFont, loadFontPreference } from './utils/themes';
+import { initializeRealtime, onGlobalReload, cleanupRealtime } from './utils/realtime';
 import './App.css';
 
 function App() {
@@ -64,6 +65,44 @@ function App() {
     const fontName = loadFontPreference();
     applyTheme(themeName, customColors);
     applyFont(fontName);
+  }, []);
+
+  // Initialize real-time database monitoring and auto-reload
+  useEffect(() => {
+    // Initialize real-time subscriptions
+    initializeRealtime();
+
+    // Set up global reload callback
+    const unsubscribeReload = onGlobalReload(async (table, payload) => {
+      console.log(`Database change detected in ${table}:`, payload);
+      
+      // Check if auto-reload is enabled in settings
+      try {
+        const settings = await getSettings();
+        if (settings.autoReload !== false) { // Default to true if not set
+          console.log('Auto-reloading website...');
+          
+          // Add a small delay to ensure the database change is fully processed
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          console.log('Auto-reload is disabled in settings');
+        }
+      } catch (error) {
+        console.error('Error checking auto-reload settings:', error);
+        // Default to auto-reload if settings can't be loaded
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribeReload();
+      cleanupRealtime();
+    };
   }, []);
 
   // Handle PWA service worker errors

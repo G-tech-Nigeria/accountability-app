@@ -4,6 +4,7 @@ import AchievementNotification from './AchievementNotification';
 const NotificationManager = () => {
   const [notifications, setNotifications] = useState([]);
   const [pendingAchievements, setPendingAchievements] = useState({});
+  const [reloadNotification, setReloadNotification] = useState(null);
 
   // Listen for achievement unlock events
   useEffect(() => {
@@ -12,9 +13,21 @@ const NotificationManager = () => {
       addAchievementToPending(achievement, user);
     };
 
+    const handleDatabaseChange = (event) => {
+      const { table } = event.detail;
+      setReloadNotification({
+        id: Date.now(),
+        table,
+        message: `Database updated (${table}). Reloading in 1 second...`
+      });
+    };
+
     window.addEventListener('achievementUnlocked', handleAchievementUnlocked);
+    window.addEventListener('databaseChange', handleDatabaseChange);
+    
     return () => {
       window.removeEventListener('achievementUnlocked', handleAchievementUnlocked);
+      window.removeEventListener('databaseChange', handleDatabaseChange);
     };
   }, []);
 
@@ -79,6 +92,30 @@ const NotificationManager = () => {
           />
         </div>
       ))}
+      
+      {/* Reload Notification */}
+      {reloadNotification && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 2000,
+          background: 'var(--accent-blue)',
+          color: 'white',
+          padding: '1rem 1.5rem',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <div style={{ animation: 'spin 1s linear infinite' }}>🔄</div>
+          {reloadNotification.message}
+        </div>
+      )}
     </>
   );
 };

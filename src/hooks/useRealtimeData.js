@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { initializeRealtime, onTableUpdate, cleanupRealtime } from '../utils/realtime';
+import { onTableUpdate } from '../utils/realtime';
 import { getUsers, getTasks, getPenaltySummary } from '../utils/database';
 
 // Custom hook for real-time data management
@@ -34,13 +34,10 @@ export const useRealtimeData = () => {
 
   // Handle real-time updates
   useEffect(() => {
-    // Initialize real-time subscriptions
-    initializeRealtime();
-
     // Load initial data
     loadInitialData();
 
-    // Set up real-time listeners
+    // Set up real-time listeners for component-specific updates
     const unsubscribeUsers = onTableUpdate('users', async (payload) => {
       console.log('Users updated via real-time:', payload);
       // Reload users data
@@ -79,7 +76,6 @@ export const useRealtimeData = () => {
       unsubscribeUsers();
       unsubscribeTasks();
       unsubscribePenalties();
-      cleanupRealtime();
     };
   }, [loadInitialData]);
 

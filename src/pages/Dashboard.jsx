@@ -59,7 +59,7 @@ const Dashboard = ({ currentDate }) => {
         }
         
         // Reload dashboard data to show updated penalties
-        await loadDashboardData();
+        await refreshData();
       } catch (error) {
         console.error('Error calculating penalties in Dashboard:', error);
       }
@@ -253,23 +253,6 @@ const Dashboard = ({ currentDate }) => {
         <span>Dashboard</span>
         <span className="breadcrumb-separator">{'>'}</span>
         <span>Overview</span>
-        <button
-          onClick={refreshData}
-          disabled={loading}
-          style={{
-            marginLeft: 'auto',
-            background: 'var(--accent-blue)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            padding: '0.25rem 0.5rem',
-            fontSize: '0.75rem',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.6 : 1
-          }}
-        >
-          {loading ? '🔄 Loading...' : '🔄 Refresh'}
-        </button>
       </div>
 
 

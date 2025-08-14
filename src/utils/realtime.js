@@ -16,6 +16,9 @@ let updateCallbacks = {
   achievements: []
 };
 
+// Global reload callback
+let globalReloadCallback = null;
+
 // Initialize real-time subscriptions
 export const initializeRealtime = () => {
   // Subscribe to users table changes
@@ -26,6 +29,16 @@ export const initializeRealtime = () => {
       (payload) => {
         console.log('Users real-time update:', payload);
         updateCallbacks.users.forEach(callback => callback(payload));
+        // Trigger global reload
+        if (globalReloadCallback) {
+          // Show reload notification
+          const event = new CustomEvent('databaseChange', {
+            detail: { table: 'users', payload }
+          });
+          window.dispatchEvent(event);
+          
+          globalReloadCallback('users', payload);
+        }
       }
     )
     .subscribe();
@@ -38,6 +51,16 @@ export const initializeRealtime = () => {
       (payload) => {
         console.log('Tasks real-time update:', payload);
         updateCallbacks.tasks.forEach(callback => callback(payload));
+        // Trigger global reload
+        if (globalReloadCallback) {
+          // Show reload notification
+          const event = new CustomEvent('databaseChange', {
+            detail: { table: 'tasks', payload }
+          });
+          window.dispatchEvent(event);
+          
+          globalReloadCallback('tasks', payload);
+        }
       }
     )
     .subscribe();
@@ -50,6 +73,16 @@ export const initializeRealtime = () => {
       (payload) => {
         console.log('Penalties real-time update:', payload);
         updateCallbacks.penalties.forEach(callback => callback(payload));
+        // Trigger global reload
+        if (globalReloadCallback) {
+          // Show reload notification
+          const event = new CustomEvent('databaseChange', {
+            detail: { table: 'penalties', payload }
+          });
+          window.dispatchEvent(event);
+          
+          globalReloadCallback('penalties', payload);
+        }
       }
     )
     .subscribe();
@@ -62,6 +95,16 @@ export const initializeRealtime = () => {
       (payload) => {
         console.log('Achievements real-time update:', payload);
         updateCallbacks.achievements.forEach(callback => callback(payload));
+        // Trigger global reload
+        if (globalReloadCallback) {
+          // Show reload notification
+          const event = new CustomEvent('databaseChange', {
+            detail: { table: 'achievements', payload }
+          });
+          window.dispatchEvent(event);
+          
+          globalReloadCallback('achievements', payload);
+        }
       }
     )
     .subscribe();
@@ -79,6 +122,14 @@ export const onTableUpdate = (table, callback) => {
     if (updateCallbacks[table]) {
       updateCallbacks[table] = updateCallbacks[table].filter(cb => cb !== callback);
     }
+  };
+};
+
+// Register global reload callback
+export const onGlobalReload = (callback) => {
+  globalReloadCallback = callback;
+  return () => {
+    globalReloadCallback = null;
   };
 };
 
@@ -101,6 +152,7 @@ export const cleanupRealtime = () => {
     penalties: [],
     achievements: []
   };
+  globalReloadCallback = null;
   console.log('Real-time subscriptions cleaned up');
 };
 

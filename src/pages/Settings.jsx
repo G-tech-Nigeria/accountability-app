@@ -629,6 +629,37 @@ const SettingsPage = () => {
                 max="100"
               />
             </div>
+            <div>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                marginBottom: '0.5rem',
+                color: 'var(--text-primary)',
+                cursor: 'pointer'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={settings.autoReload !== false}
+                  onChange={(e) => handleUpdateSettings({ autoReload: e.target.checked })}
+                  style={{
+                    width: '1rem',
+                    height: '1rem',
+                    cursor: 'pointer'
+                  }}
+                />
+                Auto-reload website on database changes
+              </label>
+              <p style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-secondary)',
+                marginTop: '0.25rem'
+              }}>
+                When enabled, the website will automatically reload when any changes are made to the database (tasks, users, penalties, etc.)
+              </p>
+            </div>
           </div>
         </div>
       </div>
