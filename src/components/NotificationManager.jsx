@@ -1,0 +1,86 @@
+import React, { useState, useEffect } from 'react';
+import AchievementNotification from './AchievementNotification';
+
+const NotificationManager = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [pendingAchievements, setPendingAchievements] = useState({});
+
+  // Listen for achievement unlock events
+  useEffect(() => {
+    const handleAchievementUnlocked = (event) => {
+      const { achievement, user } = event.detail;
+      addAchievementToPending(achievement, user);
+    };
+
+    window.addEventListener('achievementUnlocked', handleAchievementUnlocked);
+    return () => {
+      window.removeEventListener('achievementUnlocked', handleAchievementUnlocked);
+    };
+  }, []);
+
+  const addAchievementToPending = (achievement, user) => {
+    const userId = user.id;
+    setPendingAchievements(prev => {
+      const userAchievements = prev[userId] || { achievements: [], user: user };
+      const updated = {
+        ...prev,
+        [userId]: {
+          achievements: [...userAchievements.achievements, achievement],
+          user: user
+        }
+      };
+      
+      // Schedule notification after a short delay to batch multiple achievements
+      setTimeout(() => {
+        showNotification(userId);
+      }, 100);
+      
+      return updated;
+    });
+  };
+
+  const showNotification = (userId) => {
+    const userData = pendingAchievements[userId];
+    if (!userData || !userData.achievements || userData.achievements.length === 0) return;
+
+    const id = Date.now();
+    
+    setNotifications(prev => [...prev, { 
+      id, 
+      achievements: userData.achievements, 
+      user: userData.user 
+    }]);
+    
+    // Clear pending achievements for this user
+    setPendingAchievements(prev => {
+      const updated = { ...prev };
+      delete updated[userId];
+      return updated;
+    });
+  };
+
+  const removeNotification = (id) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== id));
+  };
+
+  return (
+    <>
+      {notifications.map((notification, index) => (
+        <div key={notification.id} style={{
+          position: 'fixed',
+          top: `${20 + (index * 120)}px`,
+          right: '20px',
+          zIndex: 1000 + index
+        }}>
+          <AchievementNotification
+            achievements={notification.achievements}
+            user={notification.user}
+            onClose={() => removeNotification(notification.id)}
+          />
+        </div>
+      ))}
+    </>
+  );
+};
+
+export default NotificationManager;

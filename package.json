@@ -1,0 +1,36 @@
+{
+  "name": "accountability-todo-pwa",
+  "version": "1.0.0",
+  "description": "A Progressive Web App for friends to hold each other accountable for completing daily tasks",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.55.0",
+    "date-fns": "^2.29.3",
+    "lucide-react": "^0.263.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0",
+    "recharts": "^2.7.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@vitejs/plugin-react": "^3.1.0",
+    "vite": "^4.1.0",
+    "vite-plugin-pwa": "^0.14.0"
+  },
+  "keywords": [
+    "pwa",
+    "todo",
+    "accountability",
+    "react"
+  ],
+  "author": "Accountability Team",
+  "license": "MIT"
+}

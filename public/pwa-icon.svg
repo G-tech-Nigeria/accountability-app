@@ -1,0 +1,19 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#3b82f6"/>
+  
+  <!-- Checkmark for accountability -->
+  <path d="M128 256L224 352L384 192" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Calendar icon -->
+  <rect x="160" y="120" width="192" height="160" rx="8" fill="white" opacity="0.2"/>
+  <rect x="160" y="120" width="192" height="32" rx="8" fill="white" opacity="0.3"/>
+  <circle cx="200" cy="136" r="4" fill="#3b82f6"/>
+  <circle cx="312" cy="136" r="4" fill="#3b82f6"/>
+  
+  <!-- Task list lines -->
+  <rect x="180" y="180" width="152" height="4" rx="2" fill="white" opacity="0.8"/>
+  <rect x="180" y="200" width="120" height="4" rx="2" fill="white" opacity="0.6"/>
+  <rect x="180" y="220" width="140" height="4" rx="2" fill="white" opacity="0.8"/>
+  <rect x="180" y="240" width="100" height="4" rx="2" fill="white" opacity="0.6"/>
+</svg>
