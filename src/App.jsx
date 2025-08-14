@@ -66,6 +66,40 @@ function App() {
     applyFont(fontName);
   }, []);
 
+  // Handle PWA service worker errors
+  useEffect(() => {
+    const handleError = (event) => {
+      // Ignore IndexedDB errors from service worker as they're usually harmless
+      if (event.error && event.error.message && 
+          (event.error.message.includes('IDBDatabase') || 
+           event.error.message.includes('transaction'))) {
+        console.warn('PWA IndexedDB error (harmless):', event.error.message);
+        return;
+      }
+      console.error('App error:', event.error);
+    };
+
+    const handleUnhandledRejection = (event) => {
+      // Ignore IndexedDB errors from service worker
+      if (event.reason && event.reason.message && 
+          (event.reason.message.includes('IDBDatabase') || 
+           event.reason.message.includes('transaction'))) {
+        console.warn('PWA IndexedDB rejection (harmless):', event.reason.message);
+        event.preventDefault();
+        return;
+      }
+      console.error('Unhandled promise rejection:', event.reason);
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
   // Update current date at midnight and check for penalties
   useEffect(() => {
     try {
