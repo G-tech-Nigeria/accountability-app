@@ -135,9 +135,6 @@ function App() {
       const updateDate = async () => {
         const newDate = getCurrentDateString();
         
-        console.log('App: Current system date:', newDate);
-        console.log('App: Previous currentDate state:', currentDate);
-        
         // Only update if the date has actually changed
         if (newDate !== currentDate) {
           console.log('App: Date changed from', currentDate, 'to', newDate);
@@ -157,6 +154,12 @@ function App() {
             }
           } catch (error) {
             console.error('Error calculating penalties in App:', error);
+          }
+        } else {
+          // Only log this occasionally to avoid spam
+          const now = new Date();
+          if (now.getMinutes() === 0) { // Log only at the top of each hour
+            console.log('App: Date check completed - no change detected (current date:', newDate, ')');
           }
         }
       };
