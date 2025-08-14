@@ -15,6 +15,7 @@ import { getUsers, getTasks, addTask, updateTask, deleteTask, calculateMissedTas
 import { checkAllAchievements } from '../utils/achievements';
 import { format, addDays, subDays, isToday, isYesterday } from 'date-fns';
 import TaskIconSelector from '../components/TaskIconSelector';
+import { onTableUpdate } from '../utils/realtime';
 
 const DailyTasks = ({ currentDate }) => {
   const [users, setUsers] = useState([]);
@@ -80,6 +81,38 @@ const DailyTasks = ({ currentDate }) => {
       window.removeEventListener('achievementUnlocked', handleAchievementUnlock);
     };
   }, []);
+
+  // Real-time updates for tasks and users
+  useEffect(() => {
+    const unsubscribeTasks = onTableUpdate('tasks', async (payload) => {
+      console.log('DailyTasks: Tasks updated via real-time:', payload);
+      // Reload tasks data
+      try {
+        const tasksData = await getTasks();
+        const filteredTasks = tasksData.filter(task => task.date === selectedDate);
+        setTasks(filteredTasks);
+      } catch (err) {
+        console.error('Error updating tasks in DailyTasks:', err);
+      }
+    });
+
+    const unsubscribeUsers = onTableUpdate('users', async (payload) => {
+      console.log('DailyTasks: Users updated via real-time:', payload);
+      // Reload users data
+      try {
+        const usersData = await getUsers();
+        setUsers(usersData);
+      } catch (err) {
+        console.error('Error updating users in DailyTasks:', err);
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribeTasks();
+      unsubscribeUsers();
+    };
+  }, [selectedDate]);
 
   const loadData = async () => {
     const usersData = await getUsers();

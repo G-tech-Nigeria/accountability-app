@@ -17,6 +17,7 @@ import {
 import { getUsers, saveUsers, getSettings, saveSettings, exportData, importData, clearAllData, resetUserProgress, calculateMissedTaskPenalties, cleanupDuplicatePenalties } from '../utils/database';
 import { migrateFromLocalStorage, checkMigrationNeeded } from '../utils/migrate-data';
 import { subDays } from 'date-fns';
+import { onTableUpdate } from '../utils/realtime';
 
 const SettingsPage = () => {
   const [users, setUsers] = useState([]);
@@ -35,6 +36,24 @@ const SettingsPage = () => {
       setMigrationNeeded(checkMigrationNeeded());
     };
     loadData();
+  }, []);
+
+  // Real-time updates for users
+  useEffect(() => {
+    const unsubscribeUsers = onTableUpdate('users', async (payload) => {
+      console.log('Settings: Users updated via real-time:', payload);
+      try {
+        const usersData = await getUsers();
+        setUsers(usersData);
+      } catch (err) {
+        console.error('Error updating users in Settings:', err);
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribeUsers();
+    };
   }, []);
 
   const loadSettings = async () => {
@@ -642,7 +661,7 @@ const SettingsPage = () => {
               }}>
                 <input
                   type="checkbox"
-                  checked={settings.autoReload !== false}
+                  checked={settings.autoReload === true}
                   onChange={(e) => handleUpdateSettings({ autoReload: e.target.checked })}
                   style={{
                     width: '1rem',
@@ -657,7 +676,7 @@ const SettingsPage = () => {
                 color: 'var(--text-secondary)',
                 marginTop: '0.25rem'
               }}>
-                When enabled, the website will automatically reload when any changes are made to the database (tasks, users, penalties, etc.)
+                When enabled, the website will automatically reload when any changes are made to the database. By default, real-time updates are used instead.
               </p>
             </div>
           </div>

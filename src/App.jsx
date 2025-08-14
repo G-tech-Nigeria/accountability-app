@@ -79,7 +79,7 @@ function App() {
       // Check if auto-reload is enabled in settings
       try {
         const settings = await getSettings();
-        if (settings.autoReload !== false) { // Default to true if not set
+        if (settings.autoReload === true) { // Only reload if explicitly enabled
           console.log('Auto-reloading website...');
           
           // Add a small delay to ensure the database change is fully processed
@@ -87,14 +87,12 @@ function App() {
             window.location.reload();
           }, 1000);
         } else {
-          console.log('Auto-reload is disabled in settings');
+          console.log('Auto-reload is disabled - using real-time updates instead');
         }
       } catch (error) {
         console.error('Error checking auto-reload settings:', error);
-        // Default to auto-reload if settings can't be loaded
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        // Default to real-time updates if settings can't be loaded
+        console.log('Using real-time updates (auto-reload disabled)');
       }
     });
 

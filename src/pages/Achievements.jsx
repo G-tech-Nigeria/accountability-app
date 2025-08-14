@@ -4,6 +4,7 @@ import { getAllAchievements } from '../utils/achievements';
 import { ACHIEVEMENTS } from '../utils/achievements';
 import { format } from 'date-fns';
 import { Trophy, Star, Calendar } from 'lucide-react';
+import { onTableUpdate } from '../utils/realtime';
 
 const Achievements = () => {
   const [users, setUsers] = useState([]);
@@ -14,6 +15,35 @@ const Achievements = () => {
       await loadAchievements();
     };
     loadData();
+  }, []);
+
+  // Real-time updates for users and achievements
+  useEffect(() => {
+    const unsubscribeUsers = onTableUpdate('users', async (payload) => {
+      console.log('Achievements: Users updated via real-time:', payload);
+      try {
+        const usersData = await getUsers();
+        setUsers(usersData);
+      } catch (err) {
+        console.error('Error updating users in Achievements:', err);
+      }
+    });
+
+    const unsubscribeAchievements = onTableUpdate('achievements', async (payload) => {
+      console.log('Achievements: Achievements updated via real-time:', payload);
+      try {
+        const achievementsData = await getAllAchievements();
+        setAchievements(achievementsData);
+      } catch (err) {
+        console.error('Error updating achievements in Achievements:', err);
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribeUsers();
+      unsubscribeAchievements();
+    };
   }, []);
 
   const loadAchievements = async () => {
