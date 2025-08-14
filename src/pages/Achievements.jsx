@@ -20,7 +20,6 @@ const Achievements = () => {
   // Real-time updates for users and achievements
   useEffect(() => {
     const unsubscribeUsers = onTableUpdate('users', async (payload) => {
-      console.log('Achievements: Users updated via real-time:', payload);
       try {
         const usersData = await getUsers();
         setUsers(usersData);
@@ -30,7 +29,6 @@ const Achievements = () => {
     });
 
     const unsubscribeAchievements = onTableUpdate('achievements', async (payload) => {
-      console.log('Achievements: Achievements updated via real-time:', payload);
       try {
         const achievementsData = await getAllAchievements();
         setAchievements(achievementsData);

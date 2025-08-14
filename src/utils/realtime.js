@@ -27,16 +27,9 @@ export const initializeRealtime = () => {
     .on('postgres_changes', 
       { event: '*', schema: 'public', table: TABLES.USERS },
       (payload) => {
-        console.log('Users real-time update:', payload);
         updateCallbacks.users.forEach(callback => callback(payload));
         // Trigger global reload
         if (globalReloadCallback) {
-          // Show reload notification
-          const event = new CustomEvent('databaseChange', {
-            detail: { table: 'users', payload }
-          });
-          window.dispatchEvent(event);
-          
           globalReloadCallback('users', payload);
         }
       }
@@ -49,16 +42,9 @@ export const initializeRealtime = () => {
     .on('postgres_changes', 
       { event: '*', schema: 'public', table: TABLES.TASKS },
       (payload) => {
-        console.log('Tasks real-time update:', payload);
         updateCallbacks.tasks.forEach(callback => callback(payload));
         // Trigger global reload
         if (globalReloadCallback) {
-          // Show reload notification
-          const event = new CustomEvent('databaseChange', {
-            detail: { table: 'tasks', payload }
-          });
-          window.dispatchEvent(event);
-          
           globalReloadCallback('tasks', payload);
         }
       }
@@ -71,16 +57,9 @@ export const initializeRealtime = () => {
     .on('postgres_changes', 
       { event: '*', schema: 'public', table: TABLES.PENALTIES },
       (payload) => {
-        console.log('Penalties real-time update:', payload);
         updateCallbacks.penalties.forEach(callback => callback(payload));
         // Trigger global reload
         if (globalReloadCallback) {
-          // Show reload notification
-          const event = new CustomEvent('databaseChange', {
-            detail: { table: 'penalties', payload }
-          });
-          window.dispatchEvent(event);
-          
           globalReloadCallback('penalties', payload);
         }
       }
@@ -93,16 +72,9 @@ export const initializeRealtime = () => {
     .on('postgres_changes', 
       { event: '*', schema: 'public', table: TABLES.ACHIEVEMENTS },
       (payload) => {
-        console.log('Achievements real-time update:', payload);
         updateCallbacks.achievements.forEach(callback => callback(payload));
         // Trigger global reload
         if (globalReloadCallback) {
-          // Show reload notification
-          const event = new CustomEvent('databaseChange', {
-            detail: { table: 'achievements', payload }
-          });
-          window.dispatchEvent(event);
-          
           globalReloadCallback('achievements', payload);
         }
       }

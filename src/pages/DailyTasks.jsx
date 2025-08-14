@@ -85,7 +85,6 @@ const DailyTasks = ({ currentDate }) => {
   // Real-time updates for tasks and users
   useEffect(() => {
     const unsubscribeTasks = onTableUpdate('tasks', async (payload) => {
-      console.log('DailyTasks: Tasks updated via real-time:', payload);
       // Reload tasks data
       try {
         const tasksData = await getTasks();
@@ -97,7 +96,6 @@ const DailyTasks = ({ currentDate }) => {
     });
 
     const unsubscribeUsers = onTableUpdate('users', async (payload) => {
-      console.log('DailyTasks: Users updated via real-time:', payload);
       // Reload users data
       try {
         const usersData = await getUsers();

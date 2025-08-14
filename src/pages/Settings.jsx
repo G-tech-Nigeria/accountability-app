@@ -41,7 +41,6 @@ const SettingsPage = () => {
   // Real-time updates for users
   useEffect(() => {
     const unsubscribeUsers = onTableUpdate('users', async (payload) => {
-      console.log('Settings: Users updated via real-time:', payload);
       try {
         const usersData = await getUsers();
         setUsers(usersData);

@@ -39,7 +39,6 @@ export const useRealtimeData = () => {
 
     // Set up real-time listeners for component-specific updates
     const unsubscribeUsers = onTableUpdate('users', async (payload) => {
-      console.log('Users updated via real-time:', payload);
       // Reload users data
       try {
         const updatedUsers = await getUsers();
@@ -50,7 +49,6 @@ export const useRealtimeData = () => {
     });
 
     const unsubscribeTasks = onTableUpdate('tasks', async (payload) => {
-      console.log('Tasks updated via real-time:', payload);
       // Reload tasks data
       try {
         const updatedTasks = await getTasks();
@@ -61,7 +59,6 @@ export const useRealtimeData = () => {
     });
 
     const unsubscribePenalties = onTableUpdate('penalties', async (payload) => {
-      console.log('Penalties updated via real-time:', payload);
       // Reload penalties data
       try {
         const updatedPenalties = await getPenaltySummary();
