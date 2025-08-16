@@ -28,7 +28,11 @@ const DailyTasks = ({ currentDate }) => {
   const [achievementPopup, setAchievementPopup] = useState(null);
   const [showIconSelector, setShowIconSelector] = useState(false);
   const [selectedTaskIcon, setSelectedTaskIcon] = useState('📝');
+  const [currentSlide, setCurrentSlide] = useState(0);
   const taskTitleRefs = useRef({});
+  const carouselRef = useRef(null);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   // Update selectedDate when currentDate changes (e.g., when date changes automatically)
   useEffect(() => {
@@ -415,6 +419,44 @@ const DailyTasks = ({ currentDate }) => {
     return getTasksForUser(userId).length;
   };
 
+  // Carousel navigation functions
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % users.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + users.length) % users.length);
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+
+  // Swipe gesture functions
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    }
+    if (isRightSwipe) {
+      prevSlide();
+    }
+  };
+
   return (
     <div className="container">
       {/* Breadcrumbs */}
@@ -498,8 +540,8 @@ const DailyTasks = ({ currentDate }) => {
         </button>
       </div>
 
-      {/* Dynamic Column Layout */}
-      <div style={{ 
+      {/* Desktop Grid Layout */}
+      <div className="desktop-layout" style={{ 
         display: 'grid', 
         gridTemplateColumns: `repeat(auto-fit, minmax(280px, 1fr))`,
         gap: '1rem',
@@ -524,7 +566,7 @@ const DailyTasks = ({ currentDate }) => {
                 <span style={{ fontSize: '1.25rem' }}>{user.avatar}</span>
                 <div>
                   <h2 style={{ fontSize: '1rem', fontWeight: '600' }}>
-                    {user.name} ({getTaskCount(user.id)})
+                    {user.name} - {getTaskCount(user.id)}
                   </h2>
                 </div>
               </div>
@@ -873,6 +915,461 @@ const DailyTasks = ({ currentDate }) => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Mobile Carousel Layout */}
+      <div 
+        ref={carouselRef}
+        className="mobile-carousel" 
+        style={{
+          display: 'none',
+          flexDirection: 'column',
+          height: 'calc(100vh - 200px)',
+          position: 'relative'
+        }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        {/* Carousel Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem',
+          background: 'var(--bg-card)',
+          borderRadius: '12px',
+          marginBottom: '1rem',
+          border: '1px solid var(--sidebar-border)'
+        }}>
+          <button
+            onClick={prevSlide}
+            style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--sidebar-border)',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: 'var(--text-primary)'
+            }}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <span style={{ fontSize: '1.5rem' }}>{users[currentSlide]?.avatar}</span>
+            <div>
+              <h2 style={{ fontSize: '1.125rem', fontWeight: '600', margin: 0 }}>
+                {users[currentSlide]?.name}
+              </h2>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                {getTaskCount(users[currentSlide]?.id)} tasks
+              </div>
+            </div>
+          </div>
+          
+          <button
+            onClick={nextSlide}
+            style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--sidebar-border)',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: 'var(--text-primary)'
+            }}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
+        {/* Carousel Indicators */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '0.5rem',
+          marginBottom: '1rem'
+        }}>
+          {users.map((user, index) => (
+            <button
+              key={user.id}
+              onClick={() => goToSlide(index)}
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: index === currentSlide ? 'var(--accent-blue)' : 'var(--text-muted)',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Carousel Content */}
+        <div style={{
+          flex: 1,
+          background: 'var(--bg-card)',
+          borderRadius: '12px',
+          border: '1px solid var(--sidebar-border)',
+          padding: '1rem',
+          overflowY: 'auto'
+        }}>
+          {/* Task List for Current User */}
+          <div style={{ marginBottom: '1rem' }}>
+            {getTasksForUser(users[currentSlide]?.id).map(task => (
+              <div key={task.id} style={{
+                background: 'var(--bg-primary)',
+                borderRadius: '8px',
+                padding: '0.75rem',
+                marginBottom: '0.5rem',
+                border: '1px solid var(--sidebar-border)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                  {/* Checkbox */}
+                  <div 
+                    onClick={() => !isDateInPast() && handleToggleTask(task.id)}
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      border: '2px solid var(--text-muted)',
+                      cursor: isDateInPast() ? 'not-allowed' : 'pointer',
+                      marginTop: '2px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: task.status === 'completed' ? 'var(--accent-green)' : 'transparent',
+                      borderColor: task.status === 'completed' ? 'var(--accent-green)' : 'var(--text-muted)',
+                      flexShrink: 0,
+                      opacity: isDateInPast() ? 0.5 : 1
+                    }}
+                  >
+                    {task.status === 'completed' && (
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: 'white'
+                      }} />
+                    )}
+                  </div>
+
+                  {/* Task Content */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      marginBottom: '0.25rem'
+                    }}>
+                      <span style={{ fontSize: '1rem' }}>
+                        {task.icon || '📝'}
+                      </span>
+                      <div style={{
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        textDecoration: task.status === 'completed' ? 'line-through' : 'none',
+                        color: task.status === 'completed' ? 'var(--text-muted)' : 'var(--text-primary)',
+                        wordWrap: 'break-word',
+                        flex: 1
+                      }}>
+                        {task.title}
+                      </div>
+                    </div>
+                    
+                    {/* Date and Time */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                      fontSize: '0.75rem',
+                      color: 'var(--accent-orange)',
+                      marginBottom: '0.5rem',
+                      flexWrap: 'wrap'
+                    }}>
+                      <Calendar size={12} />
+                      <span>{format(new Date(task.date), 'dd MMM')}</span>
+                      {task.time && (
+                        <>
+                          <Clock size={12} />
+                          <span>{task.time}</span>
+                        </>
+                      )}
+                      <ArrowRight size={12} style={{ color: 'var(--text-muted)' }} />
+                      <Copy size={12} style={{ color: 'var(--text-muted)' }} />
+                      <button
+                        onClick={() => !isDateInPast() && handleDeleteTask(task.id)}
+                        disabled={isDateInPast()}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: isDateInPast() ? 'var(--text-muted)' : 'var(--accent-red)',
+                          cursor: isDateInPast() ? 'not-allowed' : 'pointer',
+                          padding: '0.25rem',
+                          opacity: isDateInPast() ? 0.5 : 1
+                        }}
+                        title={isDateInPast() ? 'Cannot delete past tasks' : 'Delete task'}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+
+                    {/* Proof of Completion */}
+                    {task.proof ? (
+                      <div style={{ marginTop: '0.5rem' }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          marginBottom: '0.5rem'
+                        }}>
+                          <span style={{
+                            fontSize: '0.75rem',
+                            color: task.proof === 'uploading...' ? 'var(--accent-orange)' : 'var(--accent-green)',
+                            fontWeight: '500'
+                          }}>
+                            {task.proof === 'uploading...' ? '⏳ Uploading...' : '✅ Proof uploaded'}
+                          </span>
+                          {task.proof !== 'uploading...' && (
+                            <button
+                              onClick={() => !isDateInPast() && handleRemoveProof(task.id)}
+                              disabled={isDateInPast()}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: isDateInPast() ? 'var(--text-muted)' : 'var(--text-muted)',
+                                cursor: isDateInPast() ? 'not-allowed' : 'pointer',
+                                padding: '0.25rem',
+                                opacity: isDateInPast() ? 0.5 : 1
+                              }}
+                            >
+                              <X size={12} />
+                            </button>
+                          )}
+                        </div>
+                        {task.proof === 'uploading...' ? (
+                          <div style={{
+                            width: '100%',
+                            maxWidth: '200px',
+                            height: '120px',
+                            background: 'var(--bg-secondary)',
+                            borderRadius: '6px',
+                            border: '1px solid var(--sidebar-border)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--text-muted)',
+                            fontSize: '0.75rem'
+                          }}>
+                            ⏳ Uploading...
+                          </div>
+                        ) : (
+                          <img
+                            src={getImageUrl(task.proof)}
+                            alt="Task proof"
+                            onClick={() => setSelectedImage(getImageUrl(task.proof))}
+                            style={{
+                              width: '100%',
+                              maxWidth: '200px',
+                              height: '120px',
+                              objectFit: 'cover',
+                              borderRadius: '6px',
+                              border: '1px solid var(--sidebar-border)',
+                              cursor: 'pointer',
+                              transition: 'transform 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                            onError={(e) => {
+                              console.error('Failed to load image:', task.proof);
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ marginTop: '0.5rem' }}>
+                        <button
+                          onClick={() => !isDateInPast() && handleProofUpload(task.id)}
+                          disabled={isDateInPast()}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            background: isDateInPast() ? 'var(--bg-primary)' : 'var(--bg-secondary)',
+                            border: '1px solid var(--sidebar-border)',
+                            borderRadius: '6px',
+                            padding: '0.5rem',
+                            color: isDateInPast() ? 'var(--text-muted)' : 'var(--text-secondary)',
+                            fontSize: '0.75rem',
+                            cursor: isDateInPast() ? 'not-allowed' : 'pointer',
+                            transition: 'all 0.2s ease',
+                            width: '100%',
+                            justifyContent: 'center',
+                            opacity: isDateInPast() ? 0.5 : 1
+                          }}
+                        >
+                          <Camera size={14} />
+                          {isDateInPast() ? 'Read-only' : 'Upload proof'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Task Button for Current User */}
+          <div style={{ marginTop: 'auto' }}>
+            {showAddForm[users[currentSlide]?.id] ? (
+              <div style={{
+                background: 'var(--bg-primary)',
+                borderRadius: '8px',
+                padding: '0.75rem',
+                border: '1px solid var(--sidebar-border)'
+              }}>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <button
+                    onClick={() => setShowIconSelector(true)}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--sidebar-border)',
+                      borderRadius: '6px',
+                      padding: '0.5rem',
+                      fontSize: '1.25rem',
+                      cursor: 'pointer',
+                      minWidth: '40px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {selectedTaskIcon}
+                  </button>
+                  <input
+                    ref={(el) => taskTitleRefs.current[users[currentSlide]?.id] = el}
+                    type="text"
+                    placeholder="Task title"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                    style={{
+                      flex: 1,
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--sidebar-border)',
+                      borderRadius: '6px',
+                      padding: '0.5rem',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.875rem'
+                    }}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddTask(users[currentSlide]?.id)}
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Time (optional)"
+                  value={newTask.time}
+                  onChange={(e) => setNewTask({ ...newTask, time: e.target.value })}
+                  style={{
+                    width: '100%',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--sidebar-border)',
+                    borderRadius: '6px',
+                    padding: '0.5rem',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.875rem',
+                    marginBottom: '0.5rem'
+                  }}
+                />
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    onClick={() => handleAddTask(users[currentSlide]?.id)}
+                    style={{
+                      background: 'var(--accent-blue)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '0.5rem 1rem',
+                      fontSize: '0.875rem',
+                      cursor: 'pointer',
+                      flex: 1
+                    }}
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={() => setShowAddForm({ ...showAddForm, [users[currentSlide]?.id]: false })}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      color: 'var(--text-secondary)',
+                      border: '1px solid var(--sidebar-border)',
+                      borderRadius: '6px',
+                      padding: '0.5rem 1rem',
+                      fontSize: '0.875rem',
+                      cursor: 'pointer',
+                      flex: 1
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {isDateInPast() && (
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: 'var(--accent-orange)',
+                    textAlign: 'center',
+                    marginBottom: '0.5rem',
+                    padding: '0.25rem',
+                    background: 'rgba(255, 165, 0, 0.1)',
+                    borderRadius: '4px',
+                    border: '1px solid rgba(255, 165, 0, 0.3)'
+                  }}>
+                    📅 Read-only mode - Past date
+                  </div>
+                )}
+                <button
+                  onClick={() => handleShowAddForm(users[currentSlide]?.id)}
+                  disabled={isDateInPast()}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    background: isDateInPast() ? 'var(--bg-secondary)' : 'none',
+                    border: 'none',
+                    color: isDateInPast() ? 'var(--text-secondary)' : 'var(--text-secondary)',
+                    fontSize: '0.875rem',
+                    cursor: isDateInPast() ? 'not-allowed' : 'pointer',
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    width: '100%',
+                    justifyContent: 'center',
+                    opacity: isDateInPast() ? 0.5 : 1
+                  }}
+                >
+                  <Plus size={16} />
+                  {isDateInPast() ? 'Read-only' : 'Add task'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Image Modal */}

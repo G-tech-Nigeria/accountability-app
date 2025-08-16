@@ -718,6 +718,62 @@ body {
   }
 }
 
+/* Mobile Carousel Layout */
+@media (max-width: 768px) {
+  .desktop-layout {
+    display: none !important;
+  }
+  
+  .mobile-carousel {
+    display: flex !important;
+  }
+  
+  /* Carousel animations */
+  .mobile-carousel {
+    animation: fadeIn 0.3s ease-in;
+  }
+  
+  /* Touch-friendly carousel indicators */
+  .mobile-carousel button[style*="border-radius: 50%"] {
+    min-width: 12px;
+    min-height: 12px;
+    touch-action: manipulation;
+  }
+  
+  /* Smooth transitions for carousel content */
+  .mobile-carousel > div:last-child {
+    transition: all 0.3s ease;
+  }
+  
+  /* Touch-friendly carousel */
+  .mobile-carousel {
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Prevent text selection during swipe */
+  .mobile-carousel * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-carousel {
+    display: none !important;
+  }
+  
+  .desktop-layout {
+    display: grid !important;
+  }
+}
+
 @media (max-width: 768px) {
   .progress-cards {
     grid-template-columns: repeat(2, 1fr);
