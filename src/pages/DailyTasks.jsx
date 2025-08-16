@@ -20,7 +20,7 @@ import { onTableUpdate } from '../utils/realtime';
 const DailyTasks = ({ currentDate }) => {
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({ title: '', userId: '', time: '' });
+  const [newTask, setNewTask] = useState({ title: '', userId: '', time: '', description: '' });
   const [showAddForm, setShowAddForm] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedDate, setSelectedDate] = useState(currentDate);
@@ -236,7 +236,7 @@ const DailyTasks = ({ currentDate }) => {
       date: selectedDate,
       time: newTask.time || '',
       status: 'pending',
-      description: '',
+      description: newTask.description || '',
       proof: null,
       icon: selectedTaskIcon
     };
@@ -254,7 +254,7 @@ const DailyTasks = ({ currentDate }) => {
     }
     
     // Reset form
-    setNewTask({ title: '', userId: '', time: '' });
+    setNewTask({ title: '', userId: '', time: '', description: '' });
     setShowAddForm({ ...showAddForm, [userId]: false });
     
     // Check for achievements in the background (don't wait for it)
@@ -458,20 +458,13 @@ const DailyTasks = ({ currentDate }) => {
   };
 
   return (
-    <div className="container">
-      {/* Breadcrumbs */}
-      <div className="breadcrumbs">
-        <span>Dashboard</span>
-        <span className="breadcrumb-separator">{'>'}</span>
-        <span>Daily Tasks</span>
-      </div>
-
+    <div className="container" style={{ paddingTop: '0.5rem' }}>
       {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+      <div style={{ marginBottom: '0.75rem', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.25rem' }}>
           Daily Tasks
         </h1>
-        <p style={{ color: 'var(--text-secondary)' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
           {format(new Date(selectedDate), 'EEEE, MMMM do, yyyy')}
         </p>
       </div>
@@ -480,11 +473,11 @@ const DailyTasks = ({ currentDate }) => {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '1rem',
-        marginBottom: '2rem',
-        padding: '0.5rem 1rem',
+        gap: '0.75rem',
+        marginBottom: '0.75rem',
+        padding: '0.375rem 0.75rem',
         background: 'var(--bg-card)',
-        borderRadius: '12px',
+        borderRadius: '8px',
         border: '1px solid var(--sidebar-border)'
       }}>
         <button
@@ -544,28 +537,28 @@ const DailyTasks = ({ currentDate }) => {
       <div className="desktop-layout" style={{ 
         display: 'grid', 
         gridTemplateColumns: `repeat(auto-fit, minmax(280px, 1fr))`,
-        gap: '1rem',
+        gap: '0.75rem',
         minHeight: 'calc(100vh - 200px)'
       }}>
         {users.map(user => (
           <div key={user.id} style={{ 
             background: 'var(--bg-card)', 
-            borderRadius: '12px',
+            borderRadius: '8px',
             border: '1px solid var(--sidebar-border)',
-            padding: '1rem'
+            padding: '0.75rem'
           }}>
             {/* Column Header */}
             <div style={{ 
               display: 'flex', 
               alignItems: 'center',
-              marginBottom: '1rem',
-              paddingBottom: '1rem',
+              marginBottom: '0.75rem',
+              paddingBottom: '0.75rem',
               borderBottom: '1px solid var(--sidebar-border)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.25rem' }}>{user.avatar}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                <span style={{ fontSize: '1rem' }}>{user.avatar}</span>
                 <div>
-                  <h2 style={{ fontSize: '1rem', fontWeight: '600' }}>
+                  <h2 style={{ fontSize: '0.875rem', fontWeight: '600' }}>
                     {user.name} - {getTaskCount(user.id)}
                   </h2>
                 </div>
@@ -573,13 +566,13 @@ const DailyTasks = ({ currentDate }) => {
             </div>
 
             {/* Task List */}
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '0.75rem' }}>
               {getTasksForUser(user.id).map(task => (
                 <div key={task.id} style={{
                   background: 'var(--bg-primary)',
-                  borderRadius: '8px',
-                  padding: '0.75rem',
-                  marginBottom: '0.5rem',
+                  borderRadius: '6px',
+                  padding: '0.5rem',
+                  marginBottom: '0.375rem',
                   border: '1px solid var(--sidebar-border)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
@@ -599,7 +592,8 @@ const DailyTasks = ({ currentDate }) => {
                         background: task.status === 'completed' ? 'var(--accent-green)' : 'transparent',
                         borderColor: task.status === 'completed' ? 'var(--accent-green)' : 'var(--text-muted)',
                         flexShrink: 0,
-                        opacity: isDateInPast() ? 0.5 : 1
+                        opacity: isDateInPast() ? 0.5 : 1,
+                        boxSizing: 'border-box'
                       }}
                     >
                       {task.status === 'completed' && (
@@ -671,6 +665,35 @@ const DailyTasks = ({ currentDate }) => {
                           <X size={12} />
                         </button>
                       </div>
+
+                      {/* Task Description */}
+                      {task.description && task.description.trim() && (
+                        <div style={{
+                          marginBottom: '0.5rem',
+                          padding: '0.5rem',
+                          background: 'var(--bg-secondary)',
+                          borderRadius: '6px',
+                          border: '1px solid var(--sidebar-border)'
+                        }}>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--text-secondary)',
+                            fontWeight: '500',
+                            marginBottom: '0.25rem'
+                          }}>
+                            📝 Description:
+                          </div>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: task.status === 'completed' ? 'var(--text-muted)' : 'var(--text-primary)',
+                            lineHeight: '1.4',
+                            wordWrap: 'break-word',
+                            textDecoration: task.status === 'completed' ? 'line-through' : 'none'
+                          }}>
+                            {task.description}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Proof of Completion */}
                       {task.proof ? (
@@ -845,10 +868,32 @@ const DailyTasks = ({ currentDate }) => {
                       padding: '0.75rem',
                       color: 'var(--text-primary)',
                       fontSize: '0.875rem',
-                      marginBottom: '0.75rem',
+                      marginBottom: '0.5rem',
                       minHeight: '44px',
                       outline: 'none',
                       transition: 'border-color 0.2s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
+                  />
+                  <textarea
+                    placeholder="Description (optional)"
+                    value={newTask.description}
+                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                    style={{
+                      width: '100%',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--sidebar-border)',
+                      borderRadius: '6px',
+                      padding: '0.75rem',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.875rem',
+                      marginBottom: '0.75rem',
+                      minHeight: '80px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s ease',
+                      resize: 'vertical',
+                      fontFamily: 'inherit'
                     }}
                     onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
                     onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
@@ -862,12 +907,12 @@ const DailyTasks = ({ currentDate }) => {
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
-                        padding: '0.75rem 1rem',
-                        fontSize: '0.875rem',
+                        padding: '0.5rem 0.75rem',
+                        fontSize: '0.75rem',
                         fontWeight: '600',
                         cursor: newTask.title.trim() ? 'pointer' : 'not-allowed',
                         flex: 1,
-                        minHeight: '44px',
+                        minHeight: '36px',
                         transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => {
@@ -890,12 +935,12 @@ const DailyTasks = ({ currentDate }) => {
                         color: 'var(--text-secondary)',
                         border: '1px solid var(--sidebar-border)',
                         borderRadius: '6px',
-                        padding: '0.75rem 1rem',
-                        fontSize: '0.875rem',
+                        padding: '0.5rem 0.75rem',
+                        fontSize: '0.75rem',
                         fontWeight: '500',
                         cursor: 'pointer',
                         flex: 1,
-                        minHeight: '44px',
+                        minHeight: '36px',
                         transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => e.target.style.background = 'var(--bg-card)'}
@@ -906,7 +951,7 @@ const DailyTasks = ({ currentDate }) => {
                   </div>
                 </div>
               ) : (
-                <div>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
                   {isDateInPast() && (
                     <div style={{
                       fontSize: '0.75rem',
@@ -927,21 +972,21 @@ const DailyTasks = ({ currentDate }) => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
+                    gap: '0.375rem',
                     background: isDateInPast() ? 'var(--bg-secondary)' : 'var(--accent-blue)',
                     border: 'none',
                     color: isDateInPast() ? 'var(--text-secondary)' : 'white',
-                    fontSize: '0.875rem',
+                    fontSize: '0.75rem',
                     fontWeight: '600',
                     cursor: isDateInPast() ? 'not-allowed' : 'pointer',
-                    padding: '0.75rem',
-                    borderRadius: '8px',
-                    width: '100%',
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '6px',
+                    width: 'auto',
                     justifyContent: 'center',
                     opacity: isDateInPast() ? 0.5 : 1,
-                    minHeight: '44px',
+                    minHeight: '36px',
                     transition: 'all 0.2s ease',
-                    boxShadow: isDateInPast() ? 'none' : '0 2px 8px rgba(59, 130, 246, 0.2)'
+                    boxShadow: isDateInPast() ? 'none' : '0 1px 4px rgba(59, 130, 246, 0.2)'
                   }}
                   onMouseEnter={(e) => {
                     if (!isDateInPast()) {
@@ -954,7 +999,7 @@ const DailyTasks = ({ currentDate }) => {
                     }
                   }}
                 >
-                  <Plus size={16} />
+                  <Plus size={14} />
                   {isDateInPast() ? 'Read-only' : 'Add Task'}
                 </button>
                 </div>
@@ -983,10 +1028,10 @@ const DailyTasks = ({ currentDate }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '1rem',
+          padding: '0.375rem',
           background: 'var(--bg-card)',
-          borderRadius: '12px',
-          marginBottom: '1rem',
+          borderRadius: '4px',
+          marginBottom: '0.375rem',
           border: '1px solid var(--sidebar-border)'
         }}>
           <button
@@ -995,29 +1040,30 @@ const DailyTasks = ({ currentDate }) => {
               background: 'var(--bg-secondary)',
               border: '1px solid var(--sidebar-border)',
               borderRadius: '50%',
-              width: '40px',
-              height: '40px',
+              width: '32px',
+              height: '32px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: 'var(--text-primary)'
+              color: 'var(--text-primary)',
+              boxSizing: 'border-box'
             }}
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={16} />
           </button>
           
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem'
+            gap: '0.375rem'
           }}>
-            <span style={{ fontSize: '1.5rem' }}>{users[currentSlide]?.avatar}</span>
+            <span style={{ fontSize: '0.875rem' }}>{users[currentSlide]?.avatar}</span>
             <div>
-              <h2 style={{ fontSize: '1.125rem', fontWeight: '600', margin: 0 }}>
+              <h2 style={{ fontSize: '0.75rem', fontWeight: '600', margin: 0 }}>
                 {users[currentSlide]?.name}
               </h2>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+              <div style={{ fontSize: '0.5rem', color: 'var(--text-secondary)' }}>
                 {getTaskCount(users[currentSlide]?.id)} tasks
               </div>
             </div>
@@ -1029,80 +1075,60 @@ const DailyTasks = ({ currentDate }) => {
               background: 'var(--bg-secondary)',
               border: '1px solid var(--sidebar-border)',
               borderRadius: '50%',
-              width: '40px',
-              height: '40px',
+              width: '32px',
+              height: '32px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: 'var(--text-primary)'
+              color: 'var(--text-primary)',
+              boxSizing: 'border-box'
             }}
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={16} />
           </button>
         </div>
 
-        {/* Carousel Indicators */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '0.5rem',
-          marginBottom: '1rem'
-        }}>
-          {users.map((user, index) => (
-            <button
-              key={user.id}
-              onClick={() => goToSlide(index)}
-              style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: index === currentSlide ? 'var(--accent-blue)' : 'var(--text-muted)',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            />
-          ))}
-        </div>
+
 
         {/* Carousel Content */}
         <div style={{
           flex: 1,
           background: 'var(--bg-card)',
-          borderRadius: '12px',
+          borderRadius: '4px',
           border: '1px solid var(--sidebar-border)',
-          padding: '1rem',
+          padding: '0.375rem',
           overflowY: 'auto'
         }}>
           {/* Task List for Current User */}
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: '0.5rem' }}>
             {getTasksForUser(users[currentSlide]?.id).map(task => (
               <div key={task.id} style={{
                 background: 'var(--bg-primary)',
-                borderRadius: '8px',
-                padding: '0.75rem',
-                marginBottom: '0.5rem',
+                borderRadius: '4px',
+                padding: '0.375rem',
+                marginBottom: '0.25rem',
                 border: '1px solid var(--sidebar-border)'
               }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.375rem' }}>
                   {/* Checkbox */}
                   <div 
                     onClick={() => !isDateInPast() && handleToggleTask(task.id)}
                     style={{
-                      width: '20px',
-                      height: '20px',
+                      width: '16px',
+                      height: '16px',
                       borderRadius: '50%',
                       border: '2px solid var(--text-muted)',
                       cursor: isDateInPast() ? 'not-allowed' : 'pointer',
-                      marginTop: '2px',
+                      marginTop: '1px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       background: task.status === 'completed' ? 'var(--accent-green)' : 'transparent',
                       borderColor: task.status === 'completed' ? 'var(--accent-green)' : 'var(--text-muted)',
                       flexShrink: 0,
-                      opacity: isDateInPast() ? 0.5 : 1
+                      opacity: isDateInPast() ? 0.5 : 1,
+                      boxSizing: 'border-box'
                     }}
                   >
                     {task.status === 'completed' && (
@@ -1120,14 +1146,14 @@ const DailyTasks = ({ currentDate }) => {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.5rem',
-                      marginBottom: '0.25rem'
+                      gap: '0.25rem',
+                      marginBottom: '0.125rem'
                     }}>
-                      <span style={{ fontSize: '1rem' }}>
+                      <span style={{ fontSize: '0.75rem' }}>
                         {task.icon || '📝'}
                       </span>
                       <div style={{
-                        fontSize: '0.875rem',
+                        fontSize: '0.625rem',
                         fontWeight: '500',
                         textDecoration: task.status === 'completed' ? 'line-through' : 'none',
                         color: task.status === 'completed' ? 'var(--text-muted)' : 'var(--text-primary)',
@@ -1142,10 +1168,10 @@ const DailyTasks = ({ currentDate }) => {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.25rem',
-                      fontSize: '0.75rem',
+                      gap: '0.125rem',
+                      fontSize: '0.5rem',
                       color: 'var(--accent-orange)',
-                      marginBottom: '0.5rem',
+                      marginBottom: '0.25rem',
                       flexWrap: 'wrap'
                     }}>
                       <Calendar size={12} />
@@ -1174,6 +1200,35 @@ const DailyTasks = ({ currentDate }) => {
                         <X size={12} />
                       </button>
                     </div>
+
+                    {/* Task Description */}
+                    {task.description && task.description.trim() && (
+                      <div style={{
+                        marginBottom: '0.25rem',
+                        padding: '0.25rem',
+                        background: 'var(--bg-secondary)',
+                        borderRadius: '3px',
+                        border: '1px solid var(--sidebar-border)'
+                      }}>
+                        <div style={{
+                          fontSize: '0.5rem',
+                          color: 'var(--text-secondary)',
+                          fontWeight: '500',
+                          marginBottom: '0.125rem'
+                        }}>
+                          📝 Description:
+                        </div>
+                        <div style={{
+                          fontSize: '0.5rem',
+                          color: task.status === 'completed' ? 'var(--text-muted)' : 'var(--text-primary)',
+                          lineHeight: '1.2',
+                          wordWrap: 'break-word',
+                          textDecoration: task.status === 'completed' ? 'line-through' : 'none'
+                        }}>
+                          {task.description}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Proof of Completion */}
                     {task.proof ? (
@@ -1286,23 +1341,23 @@ const DailyTasks = ({ currentDate }) => {
             {showAddForm[users[currentSlide]?.id] ? (
               <div style={{
                 background: 'var(--bg-primary)',
-                borderRadius: '12px',
-                padding: '1rem',
+                borderRadius: '6px',
+                padding: '0.5rem',
                 border: '1px solid var(--sidebar-border)',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)'
               }}>
-                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '0.375rem' }}>
                   <button
                     onClick={() => setShowIconSelector(true)}
                     style={{
                       background: 'var(--bg-secondary)',
                       border: '1px solid var(--sidebar-border)',
-                      borderRadius: '8px',
-                      padding: '0.75rem',
-                      fontSize: '1.5rem',
+                      borderRadius: '4px',
+                      padding: '0.375rem',
+                      fontSize: '1rem',
                       cursor: 'pointer',
-                      minWidth: '48px',
-                      minHeight: '48px',
+                      minWidth: '32px',
+                      minHeight: '32px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1323,11 +1378,11 @@ const DailyTasks = ({ currentDate }) => {
                       flex: 1,
                       background: 'var(--bg-secondary)',
                       border: '1px solid var(--sidebar-border)',
-                      borderRadius: '8px',
-                      padding: '0.75rem',
+                      borderRadius: '4px',
+                      padding: '0.375rem',
                       color: 'var(--text-primary)',
-                      fontSize: '1rem',
-                      minHeight: '48px',
+                      fontSize: '0.75rem',
+                      minHeight: '32px',
                       outline: 'none',
                       transition: 'border-color 0.2s ease'
                     }}
@@ -1345,19 +1400,41 @@ const DailyTasks = ({ currentDate }) => {
                     width: '100%',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--sidebar-border)',
-                    borderRadius: '8px',
-                    padding: '0.75rem',
+                    borderRadius: '4px',
+                    padding: '0.375rem',
                     color: 'var(--text-primary)',
-                    fontSize: '1rem',
-                    marginBottom: '1rem',
-                    minHeight: '48px',
+                    fontSize: '0.75rem',
+                    marginBottom: '0.375rem',
+                    minHeight: '32px',
                     outline: 'none',
                     transition: 'border-color 0.2s ease'
                   }}
                   onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
                   onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
                 />
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <textarea
+                  placeholder="Description (optional)"
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  style={{
+                    width: '100%',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--sidebar-border)',
+                    borderRadius: '4px',
+                    padding: '0.375rem',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.75rem',
+                    marginBottom: '0.5rem',
+                    minHeight: '60px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    resize: 'vertical',
+                    fontFamily: 'inherit'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
+                  onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
+                />
+                <div style={{ display: 'flex', gap: '0.375rem' }}>
                   <button
                     onClick={() => handleAddTask(users[currentSlide]?.id)}
                     disabled={!newTask.title.trim()}
@@ -1365,13 +1442,13 @@ const DailyTasks = ({ currentDate }) => {
                       background: newTask.title.trim() ? 'var(--accent-blue)' : 'var(--text-muted)',
                       color: 'white',
                       border: 'none',
-                      borderRadius: '8px',
-                      padding: '0.875rem 1rem',
-                      fontSize: '1rem',
+                      borderRadius: '4px',
+                      padding: '0.5rem 0.625rem',
+                      fontSize: '0.75rem',
                       fontWeight: '600',
                       cursor: newTask.title.trim() ? 'pointer' : 'not-allowed',
                       flex: 1,
-                      minHeight: '48px',
+                      minHeight: '32px',
                       transition: 'all 0.2s ease'
                     }}
                     onTouchStart={(e) => {
@@ -1393,13 +1470,13 @@ const DailyTasks = ({ currentDate }) => {
                       background: 'var(--bg-secondary)',
                       color: 'var(--text-secondary)',
                       border: '1px solid var(--sidebar-border)',
-                      borderRadius: '8px',
-                      padding: '0.875rem 1rem',
-                      fontSize: '1rem',
+                      borderRadius: '4px',
+                      padding: '0.5rem 0.625rem',
+                      fontSize: '0.75rem',
                       fontWeight: '500',
                       cursor: 'pointer',
                       flex: 1,
-                      minHeight: '48px',
+                      minHeight: '32px',
                       transition: 'all 0.2s ease'
                     }}
                     onTouchStart={(e) => e.target.style.transform = 'scale(0.98)'}
@@ -1409,8 +1486,8 @@ const DailyTasks = ({ currentDate }) => {
                   </button>
                 </div>
               </div>
-            ) : (
-              <div>
+                        ) : (
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
                 {isDateInPast() && (
                   <div style={{
                     fontSize: '0.75rem',
@@ -1425,27 +1502,27 @@ const DailyTasks = ({ currentDate }) => {
                     📅 Read-only mode - Past date
                   </div>
                 )}
-                <button
+              <button
                   onClick={() => handleShowAddForm(users[currentSlide]?.id)}
                   disabled={isDateInPast()}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.75rem',
+                    gap: '0.5rem',
                     background: isDateInPast() ? 'var(--bg-secondary)' : 'var(--accent-blue)',
                     border: 'none',
                     color: isDateInPast() ? 'var(--text-secondary)' : 'white',
-                    fontSize: '1rem',
+                    fontSize: '0.875rem',
                     fontWeight: '600',
                     cursor: isDateInPast() ? 'not-allowed' : 'pointer',
-                    padding: '0.875rem',
-                    borderRadius: '8px',
-                    width: '100%',
+                    padding: '0.625rem',
+                    borderRadius: '6px',
+                    width: 'auto',
                     justifyContent: 'center',
                     opacity: isDateInPast() ? 0.5 : 1,
-                    minHeight: '48px',
+                    minHeight: '40px',
                     transition: 'all 0.2s ease',
-                    boxShadow: isDateInPast() ? 'none' : '0 4px 12px rgba(59, 130, 246, 0.3)'
+                    boxShadow: isDateInPast() ? 'none' : '0 2px 8px rgba(59, 130, 246, 0.2)'
                   }}
                   onTouchStart={(e) => {
                     if (!isDateInPast()) {
@@ -1458,7 +1535,7 @@ const DailyTasks = ({ currentDate }) => {
                     }
                   }}
                 >
-                  <Plus size={20} />
+                  <Plus size={16} />
                   {isDateInPast() ? 'Read-only' : 'Add Task'}
                 </button>
               </div>
