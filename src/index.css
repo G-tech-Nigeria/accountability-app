@@ -762,6 +762,27 @@ body {
     -ms-user-select: none;
     user-select: none;
   }
+  
+  /* Mobile input improvements */
+  .mobile-carousel input[type="text"] {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Mobile button improvements */
+  .mobile-carousel button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  /* Better focus states for mobile */
+  .mobile-carousel input:focus {
+    outline: none;
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
 }
 
 @media (min-width: 769px) {
@@ -771,6 +792,25 @@ body {
   
   .desktop-layout {
     display: grid !important;
+  }
+  
+  /* Desktop input improvements */
+  .desktop-layout input[type="text"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Desktop button improvements */
+  .desktop-layout button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Better focus states for desktop */
+  .desktop-layout input:focus {
+    outline: none;
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
   }
 }
 

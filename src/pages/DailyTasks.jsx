@@ -797,31 +797,40 @@ const DailyTasks = ({ currentDate }) => {
                         padding: '0.5rem',
                         fontSize: '1.25rem',
                         cursor: 'pointer',
-                        minWidth: '40px',
+                        minWidth: '44px',
+                        minHeight: '44px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        transition: 'all 0.2s ease'
                       }}
+                      onMouseEnter={(e) => e.target.style.background = 'var(--bg-card)'}
+                      onMouseLeave={(e) => e.target.style.background = 'var(--bg-secondary)'}
                     >
                       {selectedTaskIcon}
                     </button>
-                  <input
+                    <input
                       ref={(el) => taskTitleRefs.current[user.id] = el}
-                    type="text"
-                    placeholder="Task title"
-                    value={newTask.title}
-                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                    style={{
+                      type="text"
+                      placeholder="Task title"
+                      value={newTask.title}
+                      onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                      style={{
                         flex: 1,
-                      background: 'var(--bg-secondary)',
-                      border: '1px solid var(--sidebar-border)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      color: 'var(--text-primary)',
-                        fontSize: '0.875rem'
-                    }}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddTask(user.id)}
-                  />
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--sidebar-border)',
+                        borderRadius: '6px',
+                        padding: '0.75rem',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.875rem',
+                        minHeight: '44px',
+                        outline: 'none',
+                        transition: 'border-color 0.2s ease'
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
+                      onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
+                      onKeyPress={(e) => e.key === 'Enter' && handleAddTask(user.id)}
+                    />
                   </div>
                   <input
                     type="text"
@@ -833,27 +842,46 @@ const DailyTasks = ({ currentDate }) => {
                       background: 'var(--bg-secondary)',
                       border: '1px solid var(--sidebar-border)',
                       borderRadius: '6px',
-                      padding: '0.5rem',
+                      padding: '0.75rem',
                       color: 'var(--text-primary)',
                       fontSize: '0.875rem',
-                      marginBottom: '0.5rem'
+                      marginBottom: '0.75rem',
+                      minHeight: '44px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s ease'
                     }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
                   />
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
                     <button
                       onClick={() => handleAddTask(user.id)}
+                      disabled={!newTask.title.trim()}
                       style={{
-                        background: 'var(--accent-blue)',
+                        background: newTask.title.trim() ? 'var(--accent-blue)' : 'var(--text-muted)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
-                        padding: '0.5rem 1rem',
+                        padding: '0.75rem 1rem',
                         fontSize: '0.875rem',
-                        cursor: 'pointer',
-                        flex: 1
+                        fontWeight: '600',
+                        cursor: newTask.title.trim() ? 'pointer' : 'not-allowed',
+                        flex: 1,
+                        minHeight: '44px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (newTask.title.trim()) {
+                          e.target.style.opacity = '0.9';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (newTask.title.trim()) {
+                          e.target.style.opacity = '1';
+                        }
                       }}
                     >
-                      Add
+                      Add Task
                     </button>
                     <button
                       onClick={() => setShowAddForm({ ...showAddForm, [user.id]: false })}
@@ -862,11 +890,16 @@ const DailyTasks = ({ currentDate }) => {
                         color: 'var(--text-secondary)',
                         border: '1px solid var(--sidebar-border)',
                         borderRadius: '6px',
-                        padding: '0.5rem 1rem',
+                        padding: '0.75rem 1rem',
                         fontSize: '0.875rem',
+                        fontWeight: '500',
                         cursor: 'pointer',
-                        flex: 1
+                        flex: 1,
+                        minHeight: '44px',
+                        transition: 'all 0.2s ease'
                       }}
+                      onMouseEnter={(e) => e.target.style.background = 'var(--bg-card)'}
+                      onMouseLeave={(e) => e.target.style.background = 'var(--bg-secondary)'}
                     >
                       Cancel
                     </button>
@@ -889,26 +922,40 @@ const DailyTasks = ({ currentDate }) => {
                     </div>
                   )}
                 <button
-                    onClick={() => handleShowAddForm(user.id)}
-                    disabled={isDateInPast()}
+                  onClick={() => handleShowAddForm(user.id)}
+                  disabled={isDateInPast()}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                      background: isDateInPast() ? 'var(--bg-secondary)' : 'none',
+                    background: isDateInPast() ? 'var(--bg-secondary)' : 'var(--accent-blue)',
                     border: 'none',
-                      color: isDateInPast() ? 'var(--text-secondary)' : 'var(--text-secondary)',
+                    color: isDateInPast() ? 'var(--text-secondary)' : 'white',
                     fontSize: '0.875rem',
-                      cursor: isDateInPast() ? 'not-allowed' : 'pointer',
-                    padding: '0.5rem',
-                    borderRadius: '6px',
+                    fontWeight: '600',
+                    cursor: isDateInPast() ? 'not-allowed' : 'pointer',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
                     width: '100%',
-                      justifyContent: 'center',
-                      opacity: isDateInPast() ? 0.5 : 1
+                    justifyContent: 'center',
+                    opacity: isDateInPast() ? 0.5 : 1,
+                    minHeight: '44px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: isDateInPast() ? 'none' : '0 2px 8px rgba(59, 130, 246, 0.2)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isDateInPast()) {
+                      e.target.style.opacity = '0.9';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isDateInPast()) {
+                      e.target.style.opacity = '1';
+                    }
                   }}
                 >
                   <Plus size={16} />
-                    {isDateInPast() ? 'Read-only' : 'Add task'}
+                  {isDateInPast() ? 'Read-only' : 'Add Task'}
                 </button>
                 </div>
               )}
@@ -1239,25 +1286,30 @@ const DailyTasks = ({ currentDate }) => {
             {showAddForm[users[currentSlide]?.id] ? (
               <div style={{
                 background: 'var(--bg-primary)',
-                borderRadius: '8px',
-                padding: '0.75rem',
-                border: '1px solid var(--sidebar-border)'
+                borderRadius: '12px',
+                padding: '1rem',
+                border: '1px solid var(--sidebar-border)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
               }}>
-                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
                   <button
                     onClick={() => setShowIconSelector(true)}
                     style={{
                       background: 'var(--bg-secondary)',
                       border: '1px solid var(--sidebar-border)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '1.25rem',
+                      borderRadius: '8px',
+                      padding: '0.75rem',
+                      fontSize: '1.5rem',
                       cursor: 'pointer',
-                      minWidth: '40px',
+                      minWidth: '48px',
+                      minHeight: '48px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
                     }}
+                    onTouchStart={(e) => e.target.style.transform = 'scale(0.95)'}
+                    onTouchEnd={(e) => e.target.style.transform = 'scale(1)'}
                   >
                     {selectedTaskIcon}
                   </button>
@@ -1271,11 +1323,16 @@ const DailyTasks = ({ currentDate }) => {
                       flex: 1,
                       background: 'var(--bg-secondary)',
                       border: '1px solid var(--sidebar-border)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
+                      borderRadius: '8px',
+                      padding: '0.75rem',
                       color: 'var(--text-primary)',
-                      fontSize: '0.875rem'
+                      fontSize: '1rem',
+                      minHeight: '48px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s ease'
                     }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
                     onKeyPress={(e) => e.key === 'Enter' && handleAddTask(users[currentSlide]?.id)}
                   />
                 </div>
@@ -1288,28 +1345,47 @@ const DailyTasks = ({ currentDate }) => {
                     width: '100%',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--sidebar-border)',
-                    borderRadius: '6px',
-                    padding: '0.5rem',
+                    borderRadius: '8px',
+                    padding: '0.75rem',
                     color: 'var(--text-primary)',
-                    fontSize: '0.875rem',
-                    marginBottom: '0.5rem'
+                    fontSize: '1rem',
+                    marginBottom: '1rem',
+                    minHeight: '48px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease'
                   }}
+                  onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
+                  onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
                 />
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <button
                     onClick={() => handleAddTask(users[currentSlide]?.id)}
+                    disabled={!newTask.title.trim()}
                     style={{
-                      background: 'var(--accent-blue)',
+                      background: newTask.title.trim() ? 'var(--accent-blue)' : 'var(--text-muted)',
                       color: 'white',
                       border: 'none',
-                      borderRadius: '6px',
-                      padding: '0.5rem 1rem',
-                      fontSize: '0.875rem',
-                      cursor: 'pointer',
-                      flex: 1
+                      borderRadius: '8px',
+                      padding: '0.875rem 1rem',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      cursor: newTask.title.trim() ? 'pointer' : 'not-allowed',
+                      flex: 1,
+                      minHeight: '48px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onTouchStart={(e) => {
+                      if (newTask.title.trim()) {
+                        e.target.style.transform = 'scale(0.98)';
+                      }
+                    }}
+                    onTouchEnd={(e) => {
+                      if (newTask.title.trim()) {
+                        e.target.style.transform = 'scale(1)';
+                      }
                     }}
                   >
-                    Add
+                    Add Task
                   </button>
                   <button
                     onClick={() => setShowAddForm({ ...showAddForm, [users[currentSlide]?.id]: false })}
@@ -1317,12 +1393,17 @@ const DailyTasks = ({ currentDate }) => {
                       background: 'var(--bg-secondary)',
                       color: 'var(--text-secondary)',
                       border: '1px solid var(--sidebar-border)',
-                      borderRadius: '6px',
-                      padding: '0.5rem 1rem',
-                      fontSize: '0.875rem',
+                      borderRadius: '8px',
+                      padding: '0.875rem 1rem',
+                      fontSize: '1rem',
+                      fontWeight: '500',
                       cursor: 'pointer',
-                      flex: 1
+                      flex: 1,
+                      minHeight: '48px',
+                      transition: 'all 0.2s ease'
                     }}
+                    onTouchStart={(e) => e.target.style.transform = 'scale(0.98)'}
+                    onTouchEnd={(e) => e.target.style.transform = 'scale(1)'}
                   >
                     Cancel
                   </button>
@@ -1350,21 +1431,35 @@ const DailyTasks = ({ currentDate }) => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    background: isDateInPast() ? 'var(--bg-secondary)' : 'none',
+                    gap: '0.75rem',
+                    background: isDateInPast() ? 'var(--bg-secondary)' : 'var(--accent-blue)',
                     border: 'none',
-                    color: isDateInPast() ? 'var(--text-secondary)' : 'var(--text-secondary)',
-                    fontSize: '0.875rem',
+                    color: isDateInPast() ? 'var(--text-secondary)' : 'white',
+                    fontSize: '1rem',
+                    fontWeight: '600',
                     cursor: isDateInPast() ? 'not-allowed' : 'pointer',
-                    padding: '0.5rem',
-                    borderRadius: '6px',
+                    padding: '0.875rem',
+                    borderRadius: '8px',
                     width: '100%',
                     justifyContent: 'center',
-                    opacity: isDateInPast() ? 0.5 : 1
+                    opacity: isDateInPast() ? 0.5 : 1,
+                    minHeight: '48px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: isDateInPast() ? 'none' : '0 4px 12px rgba(59, 130, 246, 0.3)'
+                  }}
+                  onTouchStart={(e) => {
+                    if (!isDateInPast()) {
+                      e.target.style.transform = 'scale(0.98)';
+                    }
+                  }}
+                  onTouchEnd={(e) => {
+                    if (!isDateInPast()) {
+                      e.target.style.transform = 'scale(1)';
+                    }
                   }}
                 >
-                  <Plus size={16} />
-                  {isDateInPast() ? 'Read-only' : 'Add task'}
+                  <Plus size={20} />
+                  {isDateInPast() ? 'Read-only' : 'Add Task'}
                 </button>
               </div>
             )}
