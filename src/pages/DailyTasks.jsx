@@ -832,24 +832,24 @@ const DailyTasks = ({ currentDate }) => {
                     >
                       {selectedTaskIcon}
                     </button>
-                    <input
-                      ref={(el) => taskTitleRefs.current[user.id] = el}
-                      type="text"
-                      placeholder="Task title"
-                      value={newTask.title}
-                      onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                      style={{
-                        flex: 1,
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--sidebar-border)',
-                        borderRadius: '6px',
-                        padding: '0.75rem',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.875rem',
-                        minHeight: '44px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s ease'
-                      }}
+                                      <input
+                    ref={(el) => taskTitleRefs.current[user.id] = el}
+                    type="text"
+                    placeholder="Task title"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                    style={{
+                      flex: 1,
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--sidebar-border)',
+                      borderRadius: '6px',
+                      padding: '0.75rem',
+                      color: 'var(--text-primary)',
+                      fontSize: '16px',
+                      minHeight: '44px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s ease'
+                    }}
                       onFocus={(e) => e.target.style.borderColor = 'var(--accent-blue)'}
                       onBlur={(e) => e.target.style.borderColor = 'var(--sidebar-border)'}
                       onKeyPress={(e) => e.key === 'Enter' && handleAddTask(user.id)}
@@ -867,7 +867,7 @@ const DailyTasks = ({ currentDate }) => {
                       borderRadius: '6px',
                       padding: '0.75rem',
                       color: 'var(--text-primary)',
-                      fontSize: '0.875rem',
+                      fontSize: '16px',
                       marginBottom: '0.5rem',
                       minHeight: '44px',
                       outline: 'none',
@@ -887,7 +887,7 @@ const DailyTasks = ({ currentDate }) => {
                       borderRadius: '6px',
                       padding: '0.75rem',
                       color: 'var(--text-primary)',
-                      fontSize: '0.875rem',
+                      fontSize: '16px',
                       marginBottom: '0.75rem',
                       minHeight: '80px',
                       outline: 'none',
@@ -1381,7 +1381,7 @@ const DailyTasks = ({ currentDate }) => {
                       borderRadius: '4px',
                       padding: '0.375rem',
                       color: 'var(--text-primary)',
-                      fontSize: '0.75rem',
+                      fontSize: '16px',
                       minHeight: '32px',
                       outline: 'none',
                       transition: 'border-color 0.2s ease'
@@ -1403,7 +1403,7 @@ const DailyTasks = ({ currentDate }) => {
                     borderRadius: '4px',
                     padding: '0.375rem',
                     color: 'var(--text-primary)',
-                    fontSize: '0.75rem',
+                    fontSize: '16px',
                     marginBottom: '0.375rem',
                     minHeight: '32px',
                     outline: 'none',
@@ -1423,7 +1423,7 @@ const DailyTasks = ({ currentDate }) => {
                     borderRadius: '4px',
                     padding: '0.375rem',
                     color: 'var(--text-primary)',
-                    fontSize: '0.75rem',
+                    fontSize: '16px',
                     marginBottom: '0.5rem',
                     minHeight: '60px',
                     outline: 'none',
