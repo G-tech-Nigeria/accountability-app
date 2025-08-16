@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
+import { logger } from './utils/logger'
 
 try {
   const rootElement = document.getElementById('root');
@@ -17,7 +18,7 @@ try {
     </React.StrictMode>,
   );
 } catch (error) {
-  console.error('Main: Error rendering app:', error);
+  logger.error('Main: Error rendering app:', error);
   
   // Fallback error display
   const rootElement = document.getElementById('root');

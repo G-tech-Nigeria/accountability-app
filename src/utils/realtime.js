@@ -1,4 +1,5 @@
 import { supabase, TABLES } from './supabase';
+import { logger } from './logger';
 
 // Store active subscriptions
 let subscriptions = {
@@ -81,7 +82,7 @@ export const initializeRealtime = () => {
     )
     .subscribe();
 
-  console.log('Real-time subscriptions initialized');
+  logger.debug('Real-time subscriptions initialized');
 };
 
 // Register callback for specific table updates
@@ -125,7 +126,7 @@ export const cleanupRealtime = () => {
     achievements: []
   };
   globalReloadCallback = null;
-  console.log('Real-time subscriptions cleaned up');
+  logger.debug('Real-time subscriptions cleaned up');
 };
 
 // Get subscription status

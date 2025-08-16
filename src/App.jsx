@@ -11,7 +11,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
 import ThemeSelector from './components/ThemeSelector';
 import { calculateMissedTaskPenalties, getSettings } from './utils/database';
-import { subDays } from 'date-fns';
+import { subDays, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { applyTheme, loadThemePreferences, applyFont, loadFontPreference } from './utils/themes';
 import { initializeRealtime, onGlobalReload, cleanupRealtime } from './utils/realtime';
 import './App.css';
@@ -48,14 +48,12 @@ function App() {
   // Force update current date on app start
   useEffect(() => {
     const today = getCurrentDateString();
-    console.log('App: Initial date set to:', today);
     setCurrentDate(today);
   }, []);
 
   // Function to force refresh current date
   const forceRefreshDate = () => {
     const today = getCurrentDateString();
-    console.log('App: Force refreshing date to:', today);
     setCurrentDate(today);
   };
 
@@ -137,7 +135,6 @@ function App() {
         
         // Only update if the date has actually changed
         if (newDate !== currentDate) {
-          console.log('App: Date changed from', currentDate, 'to', newDate);
           setCurrentDate(newDate);
           
           // Check for penalties when date changes
@@ -146,21 +143,23 @@ function App() {
             const today = new Date(newDate);
             today.setHours(0, 0, 0, 0);
             
-            // Check last 7 days for missed tasks and calculate penalties
-            for (let i = 1; i <= 7; i++) {
-              const checkDate = subDays(today, i);
-              const dateStr = getDateString(checkDate);
+            // Check entire current month for missed tasks and calculate penalties
+            const monthStart = startOfMonth(today);
+            const monthEnd = endOfMonth(today);
+            
+            // Get all days in the current month
+            const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+            
+            // Calculate penalties for each day in the month
+            for (const day of daysInMonth) {
+              const dateStr = getDateString(day);
               await calculateMissedTaskPenalties(dateStr);
             }
           } catch (error) {
             console.error('Error calculating penalties in App:', error);
           }
         } else {
-          // Only log this occasionally to avoid spam
-          const now = new Date();
-          if (now.getMinutes() === 0) { // Log only at the top of each hour
-            console.log('App: Date check completed - no change detected (current date:', newDate, ')');
-          }
+          // No date change detected - no logging to reduce console spam
         }
       };
 

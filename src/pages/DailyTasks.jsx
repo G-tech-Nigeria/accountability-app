@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { getUsers, getTasks, addTask, updateTask, deleteTask, calculateMissedTaskPenalties, getDatesWithTasks, uploadProofImage, deleteProofImage, getImageUrl } from '../utils/database';
 import { checkAllAchievements } from '../utils/achievements';
-import { format, addDays, subDays, isToday, isYesterday } from 'date-fns';
+import { format, addDays, subDays, isToday, isYesterday, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import TaskIconSelector from '../components/TaskIconSelector';
 import { onTableUpdate } from '../utils/realtime';
 
@@ -57,7 +57,6 @@ const DailyTasks = ({ currentDate }) => {
         today.setHours(0, 0, 0, 0);
         
         if (selectedDateObj < today) {
-          console.log('DailyTasks: Calculating penalties for specific date:', selectedDate);
           await calculateMissedTaskPenalties(selectedDate);
         }
       } catch (error) {
@@ -141,10 +140,16 @@ const DailyTasks = ({ currentDate }) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Check last 7 days for missed tasks and calculate penalties
-      for (let i = 1; i <= 7; i++) {
-        const checkDate = subDays(today, i);
-        const dateStr = checkDate.toISOString().split('T')[0];
+      // Check entire current month for missed tasks and calculate penalties
+      const monthStart = startOfMonth(today);
+      const monthEnd = endOfMonth(today);
+      
+      // Get all days in the current month
+      const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+      
+      // Calculate penalties for each day in the month
+      for (const day of daysInMonth) {
+        const dateStr = day.toISOString().split('T')[0];
         await calculateMissedTaskPenalties(dateStr);
       }
     } catch (error) {
@@ -159,30 +164,17 @@ const DailyTasks = ({ currentDate }) => {
 
   const handleDateChange = async (direction) => {
     const currentDateObj = new Date(selectedDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
     let newDate;
     
     if (direction === 'prev') {
       // Allow going to previous days
       newDate = subDays(currentDateObj, 1);
     } else {
-      // Allow going to next day, but only if it's not in the future
+      // Allow going to future dates - no restriction
       newDate = addDays(currentDateObj, 1);
-      const nextDateString = newDate.toISOString().split('T')[0];
-      const todayString = today.toISOString().split('T')[0];
-      
-      // Only allow if the next date is today or earlier (compare as strings)
-      if (nextDateString > todayString) {
-        // Don't allow going to future dates
-        return;
-      }
     }
     
-
-    
     const newDateString = newDate.toISOString().split('T')[0];
-    
     setSelectedDate(newDateString);
   };
 
@@ -196,6 +188,9 @@ const DailyTasks = ({ currentDate }) => {
       return 'Today';
     } else if (isYesterday(dateObj)) {
       return 'Yesterday';
+    } else if (dateObj > new Date()) {
+      // Future date
+      return format(dateObj, 'EEEE, MMMM do');
     } else {
       return format(dateObj, 'EEEE, MMMM do');
     }

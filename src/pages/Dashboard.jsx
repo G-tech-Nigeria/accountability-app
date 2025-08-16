@@ -23,7 +23,7 @@ import {
 import { calculateMissedTaskPenalties } from '../utils/database';
 import { getUserAchievements } from '../utils/achievements';
 import { checkAllAchievements } from '../utils/achievements';
-import { format, subDays } from 'date-fns';
+import { format, subDays, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import ProgressCircle from '../components/ProgressCircle';
 import { useRealtimeData } from '../hooks/useRealtimeData';
 
@@ -51,10 +51,16 @@ const Dashboard = ({ currentDate }) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        // Check last 7 days for missed tasks and calculate penalties
-        for (let i = 1; i <= 7; i++) {
-          const checkDate = subDays(today, i);
-          const dateStr = checkDate.toISOString().split('T')[0];
+        // Check entire current month for missed tasks and calculate penalties
+        const monthStart = startOfMonth(today);
+        const monthEnd = endOfMonth(today);
+        
+        // Get all days in the current month
+        const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+        
+        // Calculate penalties for each day in the month
+        for (const day of daysInMonth) {
+          const dateStr = day.toISOString().split('T')[0];
           await calculateMissedTaskPenalties(dateStr);
         }
         
@@ -100,7 +106,7 @@ const Dashboard = ({ currentDate }) => {
             const data = await response.json();
             setWeather(data);
           } else {
-            console.log('Weather API not available, using mock data');
+            // Weather API not available, using mock data
             // Fallback to mock weather data
             setWeather({
               weather: [{ main: 'Clear', description: 'clear sky' }],
@@ -109,7 +115,7 @@ const Dashboard = ({ currentDate }) => {
             });
           }
         }, (error) => {
-          console.log('Location not available, using mock data');
+          // Location not available, using mock data
           // Fallback to mock weather data
           setWeather({
             weather: [{ main: 'Clear', description: 'clear sky' }],

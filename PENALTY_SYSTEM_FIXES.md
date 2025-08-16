@@ -15,7 +15,7 @@
 **Problem**: Users could change their system date to avoid penalties.
 
 **Solution**:
-- Added automatic penalty calculation for past dates (last 7 days) in Dashboard
+- Added automatic penalty calculation for past dates (entire current month) in Dashboard
 - Added manual penalty recalculation feature in Settings
 - Penalties are calculated when viewing past dates in DailyTasks
 
@@ -32,7 +32,7 @@
 
 ### 1. Automatic Penalty Calculation
 - Penalties are automatically calculated when viewing past dates
-- Dashboard checks last 7 days for missed tasks on load
+- Dashboard checks entire current month for missed tasks on load
 - Penalties are distributed among all other users
 
 ### 2. Manual Penalty Recalculation

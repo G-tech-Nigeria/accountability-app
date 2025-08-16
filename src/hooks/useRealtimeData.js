@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { onTableUpdate } from '../utils/realtime';
 import { getUsers, getTasks, getPenaltySummary } from '../utils/database';
+import { logger } from '../utils/logger';
 
 // Custom hook for real-time data management
 export const useRealtimeData = () => {
@@ -25,7 +26,7 @@ export const useRealtimeData = () => {
       setPenalties(penaltiesData);
       setError(null);
     } catch (err) {
-      console.error('Error loading initial data:', err);
+      logger.error('Error loading initial data:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -44,7 +45,7 @@ export const useRealtimeData = () => {
         const updatedUsers = await getUsers();
         setUsers(updatedUsers);
       } catch (err) {
-        console.error('Error updating users:', err);
+        logger.error('Error updating users:', err);
       }
     });
 
@@ -54,7 +55,7 @@ export const useRealtimeData = () => {
         const updatedTasks = await getTasks();
         setTasks(updatedTasks);
       } catch (err) {
-        console.error('Error updating tasks:', err);
+        logger.error('Error updating tasks:', err);
       }
     });
 
@@ -64,7 +65,7 @@ export const useRealtimeData = () => {
         const updatedPenalties = await getPenaltySummary();
         setPenalties(updatedPenalties);
       } catch (err) {
-        console.error('Error updating penalties:', err);
+        logger.error('Error updating penalties:', err);
       }
     });
 

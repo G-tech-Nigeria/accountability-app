@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { logger } from './logger';
 
 // Supabase configuration
 // Load from environment variables
@@ -7,8 +8,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables. Please check your .env file.');
-  console.error('Required: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
+  logger.error('Missing Supabase environment variables. Please check your .env file.');
+  logger.error('Required: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
 }
 
 // Create Supabase client
@@ -25,7 +26,7 @@ export const TABLES = {
 
 // Helper function to handle database errors
 export const handleDatabaseError = (error, operation) => {
-  console.error(`Database error during ${operation}:`, error);
+  logger.dbError(operation, error);
   throw new Error(`Failed to ${operation}: ${error.message}`);
 };
 

@@ -263,6 +263,21 @@ export const addPenalty = async (penalty) => {
   }
 };
 
+export const deletePenalty = async (penaltyId) => {
+  try {
+    const { error } = await supabase
+      .from(TABLES.PENALTIES)
+      .delete()
+      .eq('id', penaltyId);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    handleDatabaseError(error, 'delete penalty');
+    return false;
+  }
+};
+
 export const getPenaltySummary = async () => {
   try {
     const penalties = await getPenalties();
@@ -326,7 +341,7 @@ export const calculateMissedTaskPenalties = async (date) => {
       // Validate that the user exists before creating penalties
       const userExists = users.some(user => user.id === userId);
       if (!userExists) {
-        console.warn(`User ${userId} not found in users table, skipping penalty calculation`);
+        // User not found, skipping penalty calculation
         return;
       }
       

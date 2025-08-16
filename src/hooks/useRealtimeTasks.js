@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { initializeRealtime, onTableUpdate, cleanupRealtime } from '../utils/realtime';
 import { getUsers, getTasks, getDatesWithTasks } from '../utils/database';
+import { logger } from '../utils/logger';
 
 // Custom hook for real-time tasks data
 export const useRealtimeTasks = (selectedDate) => {
@@ -25,7 +26,7 @@ export const useRealtimeTasks = (selectedDate) => {
       setAvailableDates(datesData);
       setError(null);
     } catch (err) {
-      console.error('Error loading initial tasks data:', err);
+      logger.error('Error loading initial tasks data:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -42,17 +43,17 @@ export const useRealtimeTasks = (selectedDate) => {
 
     // Set up real-time listeners
     const unsubscribeUsers = onTableUpdate('users', async (payload) => {
-      console.log('Users updated via real-time:', payload);
+              // Users updated via real-time
       try {
         const updatedUsers = await getUsers();
         setUsers(updatedUsers);
-      } catch (err) {
-        console.error('Error updating users:', err);
-      }
+              } catch (err) {
+          logger.error('Error updating users:', err);
+        }
     });
 
     const unsubscribeTasks = onTableUpdate('tasks', async (payload) => {
-      console.log('Tasks updated via real-time:', payload);
+              // Tasks updated via real-time
       try {
         const [updatedTasks, updatedDates] = await Promise.all([
           getTasks(),
@@ -60,9 +61,9 @@ export const useRealtimeTasks = (selectedDate) => {
         ]);
         setTasks(updatedTasks);
         setAvailableDates(updatedDates);
-      } catch (err) {
-        console.error('Error updating tasks:', err);
-      }
+              } catch (err) {
+          logger.error('Error updating tasks:', err);
+        }
     });
 
     // Cleanup on unmount
